@@ -1,15 +1,30 @@
+
+
 import React from 'react';
+
 const Sidebar: React.FC = () => {
   return (
-    <aside className="bg-purple-600 text-white w-36 min-h-screen">
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Menu</h2>
-        <ul>
-          <li className="mt-8px"><a href="/" className="text-purple-400 hover:text-purple-700">Login</a></li><br/>
-          <li className="mt-8px"><a href="/helpcenter" className="text-purple-400 hover:text-purple-700">About</a></li>
-        </ul>
+    <div className="w-full h-full bg-black text-white flex flex-col flex justify-start">
+      <div className="p-4 border-b border-gray-700 ">
+        <h2 className="text-2xl">Sidebar</h2>
       </div>
-    </aside>
+      <nav className="flex-grow p-4">
+        <ul className="space-y-2">
+          <li>
+            <a href="#" className="block p-2 rounded hover:bg-gray-700 text-white">Home</a>
+          </li>
+          <li>
+            <a href="#" className="block p-2 rounded hover:bg-gray-700 text-white">About</a>
+          </li>
+          <li>
+            <a href="#" className="block p-2 rounded hover:bg-gray-700 text-white">Services</a>
+          </li>
+          <li>
+            <a href="#" className="block p-2 rounded hover:bg-gray-700 text-white">Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
   );
 };
 
