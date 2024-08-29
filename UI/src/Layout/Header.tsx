@@ -21,7 +21,7 @@ export function Header({ SreachBox }: Header) {
     }
   }
   return (
-    <header className="bg-blue-500 text-white h-10 items-center pl-2 pr-2 flex justify-between shadow-sm shadow-gray-500">
+    <header className="bg-HeaderBackground text-white h-10 items-center pl-2 pr-2 flex justify-between shadow-sm shadow-gray-500">
       <Button
         onClick={() => setSideMenuOpen(true)}
         className="md:hidden p-0"
@@ -37,9 +37,19 @@ export function Header({ SreachBox }: Header) {
         </SheetContent>
       </Sheet>
       <div>
-        <img src={Logo} className="w-12 repeat-0 drop-shadow-lg" />
+        <img src={Logo} className="w-8 repeat-0 drop-shadow-lg" />
       </div>
-      <div className="flex gap-3 items-center justify-end">
+      <div className="flex gap-3 items-center">
+        {/* <div className="flex items-center space-x-2">
+          <Label htmlFor="airplane-mode">Me</Label>
+          <Switch
+            checked={itsme}
+            onCheckedChange={() => setItsMe(!itsme)}
+            id="airplane-mode"
+            color="gray"
+            className="bg-red-500"
+          />
+        </div> */}
         <ProfilePopover />
       </div>
     </header >

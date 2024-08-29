@@ -25,7 +25,7 @@ module.exports = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        SideNavBarColor: "#fffff",
+        SideNavBarColor: "#9893DA",
         BackG: "#5f55ee",
         C_White: "#00000",
         Cus_Orage: "#68A691",
@@ -43,7 +43,7 @@ module.exports = {
           DEFAULT: "#5b5d79",
         },
         HeaderBackground: {
-          DEFAULT: "rgb( 50, 52, 82 )",
+          DEFAULT: "#92B4F4",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
