@@ -25,16 +25,16 @@ const loginSchema = z.object({
 
 function Login() {
 
-  const { data, isLoading, isError } = useQuery('loginData', async () => {
-    const response = await fetch('https://sparkqas-api.nipponpaint.co.in/api/Users/BusinessUnits');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  });
+  // const { data, isLoading, isError } = useQuery('loginData', async () => {
+  //   const response = await fetch('https://sparkqas-api.nipponpaint.co.in/api/Users/BusinessUnits');
+  //   if (!response.ok) {
+  //     throw new Error('Network response was not ok');
+  //   }
+  //   return response.json();
+  // });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error fetching login data</p>;
+  // if (isLoading) return <p>Loading...</p>;
+  // if (isError) return <p>Error fetching login data</p>;
 
 
   const navigate = useNavigate();

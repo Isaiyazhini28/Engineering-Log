@@ -1,12 +1,10 @@
 
-import contact from '@/components/ui/contact'
-import Sidebar from '@/components/ui/sidebar';
+
 import React from 'react';
 
 const HomePage: React.FC = () => {
   return (
     <div className="flex w-full h-screen flex justify-start">
-      <Sidebar />
       <main className="flex-grow p-4 bg-white text-black">
         <h1 className="text-3xl font-bold mb-4">Home Page</h1>
         <p>
