@@ -1,6 +1,5 @@
 ﻿namespace EngineeringLog.Models.Entity
 {
-    
     public enum FrequencyType
     {
         Daily = 1,

@@ -11,7 +11,6 @@ namespace EngineeringLog.Services.Service
     public class ClientUrlServices : IClientUrlServices
     {
         private readonly HttpClient _httpClient;
-
         public ClientUrlServices(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -41,25 +40,14 @@ namespace EngineeringLog.Services.Service
         }
         public async Task<List<PlantResponse>> GetPlantsByBusinessUnitIdAsync(string businessUnitId)
         {
-            // Define the request URL for fetching plants with the provided businessUnitId
             var url = $"https://aikyamqasapi.nipponpaint.co.in/graphapi/api/Safety/GetPlantByBussinessUnit?id={businessUnitId}";
-
-            // Send an HTTP GET request to the specified URL
             var response = await _httpClient.GetAsync(url);
-
-            // Ensure the HTTP response was successful (status code 2xx)
             response.EnsureSuccessStatusCode();
-
-            // Read the response content as a string
             var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            // Deserialize the JSON response content into a list of PlantResponse objects
             var plants = JsonSerializer.Deserialize<List<PlantResponse>>(jsonResponse, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
-
-            // Return the list of plants, or an empty list if the deserialized result is null
             return plants ?? new List<PlantResponse>();
         }
 

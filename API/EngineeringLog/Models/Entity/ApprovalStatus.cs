@@ -3,9 +3,9 @@
 
     public enum ApprovalStatus
     {
-        Open,
-        Pending,
-        Reject,
-        Complete
+        Open=1,
+        Pending=2,
+        Reject=3,
+        Complete=4
     }
 }

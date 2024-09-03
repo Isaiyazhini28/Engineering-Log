@@ -3,6 +3,7 @@ using System;
 using EngineeringLog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EngineeringLog.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20240903045715_Avgcalculation")]
+    partial class Avgcalculation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,6 +229,8 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("FieldId");
 
+                    b.HasIndex("SubFieldId");
+
                     b.HasIndex("TransactionId");
 
                     b.ToTable("TransactionValues");
@@ -261,6 +266,10 @@ namespace EngineeringLog.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EngineeringLog.Models.Entity.SubFieldMaster", "SubField")
+                        .WithMany()
+                        .HasForeignKey("SubFieldId");
+
                     b.HasOne("EngineeringLog.Models.Entity.TransactionEntries", "Transaction")
                         .WithMany()
                         .HasForeignKey("TransactionId")
@@ -268,6 +277,8 @@ namespace EngineeringLog.Migrations
                         .IsRequired();
 
                     b.Navigation("Field");
+
+                    b.Navigation("SubField");
 
                     b.Navigation("Transaction");
                 });

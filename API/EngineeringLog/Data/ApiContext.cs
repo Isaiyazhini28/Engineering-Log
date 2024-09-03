@@ -20,8 +20,8 @@ namespace EngineeringLog.Data
         public DbSet<FieldMaster> FieldMasters { get; set; }
         public DbSet<SubFieldMaster> SubFieldMasters { get; set; }
         public DbSet<MapMaster> MapMasters { get; set; }
-      /*  public DbSet<TransactionEntries> TransactionsEntries { get; set; }
-        public DbSet<TransactionValues> Transactionsvalues { get; set; }*/
+        public DbSet<TransactionValues> TransactionValues { get; set; }
+        public DbSet<TransactionEntries> TransactionEntries { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
          

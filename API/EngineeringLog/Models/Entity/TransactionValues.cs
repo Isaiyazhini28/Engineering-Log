@@ -7,27 +7,19 @@ namespace EngineeringLog.Models.Entity
     {
         [Key]
         public int Id { get; set; }
-
-        [ForeignKey("TransactionsTable")]
+        [ForeignKey("TransactionsEntries")]
         public int TransactionId { get; set; }
         public TransactionEntries Transaction { get; set; }
-
         [ForeignKey("FieldMaster")]
         public int FieldId { get; set; }
         public FieldMaster Field { get; set; }
-
         [ForeignKey("SubFieldMaster")]
         public int? SubFieldId { get; set; }
-        public SubFieldMaster SubField { get; set; }
-
         public string Value { get; set; }
-
         public bool Reset { get; set; } = false;
-
         public float HourAvg { get; set; }
-
         public float PerHourAvg { get; set; }
-
-        public float PerMinAvg { get; set; }    
+        public float PerMinAvg { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 }

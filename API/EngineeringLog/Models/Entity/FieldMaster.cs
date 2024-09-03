@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EngineeringLog.Models.Entity
 {
-    
-
     public class FieldMaster
     {
         [Key]
