@@ -131,6 +131,19 @@ namespace EngineeringLog.Services.Service
         public async Task<string> CreateTransaction(TransactionRequest request)
         {
             var refId = GenerateReferenceId(request.LocationId);
+            var latestTransaction = await _dbContext.TransactionEntries
+               .Where(te => te.LocationId == request.LocationId)
+               .OrderByDescending(te => te.CreatedDate)
+               .FirstOrDefaultAsync();
+
+            // Get previous transaction values for the requested fields
+            var previousEntries = await _dbContext.TransactionValues
+                .Where(tv => tv.TransactionId == latestTransaction.Id &&
+                             request.Fields.Select(f => f.FieldId).Contains(tv.FieldId))
+                .GroupBy(tv => tv.FieldId)
+                .Select(g => g.OrderByDescending(tv => tv.Transaction.CreatedDate).FirstOrDefault())
+                .ToListAsync();
+
             // Create a new TransactionEntry
             var transactionEntry = new TransactionEntries
             {
@@ -143,14 +156,9 @@ namespace EngineeringLog.Services.Service
                 Remarks = request.Remark
             };
             _dbContext.TransactionEntries.Add(transactionEntry);
-            _dbContext.SaveChanges(); 
-            var previousEntries = await _dbContext.TransactionValues
-                                .Where(tv => request.Fields.Select(f => f.FieldId).Contains(tv.FieldId))
-                                .OrderBy(tv => tv.CreatedDate)
-                                .GroupBy(tv => tv.FieldId)
-                                .Select(g => g.OrderByDescending(tv => tv.CreatedDate).FirstOrDefault())
-                                .ToListAsync();
-
+            _dbContext.SaveChanges();
+            // Get the latest transaction for the location
+           
             // var previousEntries = await GetLastReadings(request.LocationId);
 
             // Create TransactionValues for each field
@@ -164,10 +172,8 @@ namespace EngineeringLog.Services.Service
                 // Calculate PerHourAvg and PerMinAvg
                 if (previousEntry != null)
                 {
-                    var timeDifference = (transactionEntry.CreatedDate - previousEntry.CreatedDate).TotalHours;
-                    perHourAvg = timeDifference > 0
-                        ? field.HourAvg / (float)timeDifference
-                        : 0;
+                    var timeDifferenceInHours = (transactionEntry.CreatedDate - previousEntry.Transaction.CreatedDate).TotalHours;
+                    perHourAvg = field.HourAvg / (float)timeDifferenceInHours;
                     perMinAvg = perHourAvg / 60;
                 }
                 return new TransactionValues
@@ -235,4 +241,6 @@ namespace EngineeringLog.Services.Service
             return previousMonthAvgData;
         }
     }
+
 }
+

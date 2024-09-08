@@ -20,6 +20,5 @@ namespace EngineeringLog.Models.Entity
         public float HourAvg { get; set; }
         public float PerHourAvg { get; set; }
         public float PerMinAvg { get; set; }
-        public DateTime CreatedDate { get; set; }
     }
 }
