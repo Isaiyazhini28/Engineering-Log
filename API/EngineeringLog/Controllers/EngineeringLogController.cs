@@ -39,10 +39,19 @@ namespace EngineeringLog.Controllers
             return Ok(response);
         }
 
-        [HttpGet("PreviousReading")]
+        [HttpGet("GetLastReadings")]
         public async Task<IActionResult> GetLastReadings(int locationId)
         {
-            var response =await EngService.GetLastReadings(locationId);
+            // Validate input
+            if (locationId <= 0)
+            {
+                return BadRequest("Invalid location ID.");
+            }
+
+            // Fetch the last readings for the specified location
+            var response = await EngService.GetLastReadings(locationId);
+
+            // Return the response
             return Ok(response);
         }
 

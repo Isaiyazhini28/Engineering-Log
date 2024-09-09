@@ -50,7 +50,5 @@ namespace EngineeringLog.Services.Service
             });
             return plants ?? new List<PlantResponse>();
         }
-
-
     }
 }

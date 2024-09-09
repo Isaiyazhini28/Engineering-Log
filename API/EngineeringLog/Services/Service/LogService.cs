@@ -16,6 +16,7 @@ namespace EngineeringLog.Services.Service
         {
             _dbContext = dbContext;
         }
+
         public MapResponse GetMapByPlantId(string plantId)
         {
             var mapMaster = _dbContext.Set<MapMaster>()
@@ -28,6 +29,7 @@ namespace EngineeringLog.Services.Service
                 }).FirstOrDefault();
             return mapMaster;
         }
+
         public List<LocationResponse> GetLocations()
         {
             var locations = _dbContext.Set<LocationMaster>()
@@ -43,6 +45,7 @@ namespace EngineeringLog.Services.Service
             return locations;
 
         }
+
         public FieldFrequencyResponse GetFields(int locationId)
         {
             var fields = _dbContext.Set<FieldMaster>()
@@ -93,9 +96,37 @@ namespace EngineeringLog.Services.Service
             return response;
         }
 
-        public async Task<List<PreviousReadingResponse>> GetLastReadings(int locationId)
+        public async Task<FieldFrequencyResponse> GetLastReadings(int locationId)
         {
+
+            var fieldsResponse = GetFields(locationId);
             var latestTransaction = await _dbContext.TransactionEntries
+                .Where(te => te.LocationId == locationId)
+                .OrderByDescending(te => te.CreatedDate)
+                .FirstOrDefaultAsync();
+            var transactionValues = latestTransaction != null
+                ? await _dbContext.TransactionValues
+                    .Where(tv => tv.TransactionId == latestTransaction.Id)
+                    .ToListAsync()
+                : new List<TransactionValues>();
+            foreach (var field in fieldsResponse.DailyFields.Concat(fieldsResponse.MonthlyFields))
+            {
+                if (field.HasChild)
+                {
+                    foreach (var child in field.ChildFields)
+                    {
+                        var transactionValue = transactionValues.FirstOrDefault(tv => tv.SubFieldId == child.Id);
+                        child.Type = transactionValue?.Value ?? string.Empty;
+                    }
+                }
+                else
+                {
+                    var transactionValue = transactionValues.FirstOrDefault(tv => tv.FieldId == field.Id);
+                    field.Type = transactionValue?.Value ?? string.Empty;
+                }
+            }
+            return fieldsResponse;
+            /*var latestTransaction = await _dbContext.TransactionEntries
                .Where(te => te.LocationId == locationId)
                .OrderByDescending(te => te.CreatedDate)
                .FirstOrDefaultAsync();
@@ -113,8 +144,7 @@ namespace EngineeringLog.Services.Service
                                     .ToListAsync();
 
            
-            return transactionValues;
-
+            return transactionValues;*/
         }
 
         private string GenerateReferenceId(int locationId)
@@ -128,14 +158,18 @@ namespace EngineeringLog.Services.Service
             return $"{currentDate}-{locationId}-{serialNumber}";
         }
 
-        public async Task<string> CreateTransaction(TransactionRequest request)
+        public async Task<List<TransactionEntryResponse>>CreateTransaction(TransactionRequest request)
         {
             var refId = GenerateReferenceId(request.LocationId);
             var latestTransaction = await _dbContext.TransactionEntries
                .Where(te => te.LocationId == request.LocationId)
                .OrderByDescending(te => te.CreatedDate)
                .FirstOrDefaultAsync();
-
+            if (latestTransaction == null)
+            {
+                // Handle the case where no previous transactions exist
+                latestTransaction = new TransactionEntries { CreatedDate = DateTime.MinValue };
+            }
             // Get previous transaction values for the requested fields
             var previousEntries = await _dbContext.TransactionValues
                 .Where(tv => tv.TransactionId == latestTransaction.Id &&
@@ -143,7 +177,6 @@ namespace EngineeringLog.Services.Service
                 .GroupBy(tv => tv.FieldId)
                 .Select(g => g.OrderByDescending(tv => tv.Transaction.CreatedDate).FirstOrDefault())
                 .ToListAsync();
-
             // Create a new TransactionEntry
             var transactionEntry = new TransactionEntries
             {
@@ -160,8 +193,6 @@ namespace EngineeringLog.Services.Service
             // Get the latest transaction for the location
            
             // var previousEntries = await GetLastReadings(request.LocationId);
-
-            // Create TransactionValues for each field
             var transactionValues = request.Fields.Select(field =>
             {
                 // Find the most recent previous entry for the current field
@@ -173,7 +204,12 @@ namespace EngineeringLog.Services.Service
                 if (previousEntry != null)
                 {
                     var timeDifferenceInHours = (transactionEntry.CreatedDate - previousEntry.Transaction.CreatedDate).TotalHours;
-                    perHourAvg = field.HourAvg / (float)timeDifferenceInHours;
+                    perHourAvg = field.Difference / (float)timeDifferenceInHours;
+                    perMinAvg = perHourAvg / 60;
+                }
+                else
+                {
+                    perHourAvg = field.Difference / 24;
                     perMinAvg = perHourAvg / 60;
                 }
                 return new TransactionValues
@@ -183,22 +219,29 @@ namespace EngineeringLog.Services.Service
                     SubFieldId = field.SubFieldId,
                     Value = field.Value,
                     Reset = field.Reset,
-                    HourAvg = field.HourAvg,
+                    HourAvg = field.Difference,
                     PerHourAvg = perHourAvg,
                     PerMinAvg = perMinAvg,
                 };
             }).ToList();
             _dbContext.TransactionValues.AddRange(transactionValues);
             _dbContext.SaveChanges();
-
             // Clear the ChangeTracker to detach the entities from the context
             _dbContext.ChangeTracker.Clear();
+            var response = transactionValues.Select(tv => new TransactionEntryResponse
+            {
+                FieldId = tv.FieldId,
+                SubFieldId = tv.SubFieldId,
+                Value = tv.Value,
 
-            return transactionEntry.RefId;
+            }).ToList();
+
+            return response;
         }
 
-        public async Task<List<AvgResponse>> MTDAverage(int locationId)
-        { 
+        public async Task<FieldFrequencyResponse> MTDAverage(int locationId)
+        {
+            var fieldsResponse = GetFields(locationId);
             var currentDate = DateTime.UtcNow;
             var startOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1, 0, 0 ,0, DateTimeKind.Utc);
             var mtdAvgData = await (from te in _dbContext.TransactionEntries
@@ -206,15 +249,30 @@ namespace EngineeringLog.Services.Service
                                     where te.LocationId == locationId &&
                                           te.CreatedDate >= startOfMonth &&
                                           te.CreatedDate <= currentDate
-                                    group tv by tv.FieldId into fieldGroup
-                                    select new AvgResponse
+                                    group tv by new { tv.FieldId, tv.SubFieldId } into fieldGroup
+                                    select new
                                     {
-                                        FieldId = fieldGroup.Key,
-                                        SubfiledId= fieldGroup.Key,
-                                        Averaage = fieldGroup.Average(x => x.HourAvg)
+                                        FieldId = fieldGroup.Key.FieldId,
+                                        SubFieldId = fieldGroup.Key.SubFieldId,
+                                        MtdAverage = fieldGroup.Average(x => x.HourAvg).ToString("F2") // Format to 2 decimal places
                                     }).ToListAsync();
-
-            return mtdAvgData;
+            foreach (var field in fieldsResponse.DailyFields.Concat(fieldsResponse.MonthlyFields))
+            {
+                if (field.HasChild)
+                {
+                    foreach (var child in field.ChildFields)
+                    {
+                        var mtdAverage = mtdAvgData.FirstOrDefault(x => x.SubFieldId == child.Id)?.MtdAverage ?? string.Empty;
+                        child.Type= mtdAverage;
+                    }
+                }
+                else
+                {
+                    var mtdAverage = mtdAvgData.FirstOrDefault(x => x.FieldId == field.Id )?.MtdAverage ?? string.Empty;
+                    field.Type = mtdAverage;
+                }
+            }
+            return fieldsResponse;
         }
 
         public async Task<List<AvgResponse>> PreviousMonthAverage(int locationId)
@@ -235,12 +293,11 @@ namespace EngineeringLog.Services.Service
                                               {
                                                   FieldId = fieldGroup.Key,
                                                   SubfiledId=fieldGroup.Key,
-                                                  Averaage = fieldGroup.Average(x => x.HourAvg)
+                                                  Average = fieldGroup.Average(x => x.HourAvg)
                                               }).ToListAsync();
 
             return previousMonthAvgData;
         }
     }
-
 }
 

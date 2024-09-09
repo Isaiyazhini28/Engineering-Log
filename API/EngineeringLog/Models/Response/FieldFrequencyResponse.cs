@@ -6,5 +6,4 @@
         public List<FieldResponse> MonthlyFields { get; set; }
        
     }
-
 }

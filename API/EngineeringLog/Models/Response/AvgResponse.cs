@@ -4,6 +4,6 @@
     {
         public int FieldId { get; set; }
         public int? SubfiledId { get; set; }
-        public float? Averaage { get; set; }
+        public float? Average { get; set; }
     }
 }

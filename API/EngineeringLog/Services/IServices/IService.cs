@@ -7,11 +7,10 @@ namespace EngineeringLog.Services.IServices
     {
         MapResponse GetMapByPlantId(string plantId);
         List<LocationResponse> GetLocations();
-
         FieldFrequencyResponse GetFields(int locationId);
-        Task<string> CreateTransaction(TransactionRequest request);
-        Task<List<PreviousReadingResponse>> GetLastReadings(int locationId);
-        Task<List<AvgResponse>> MTDAverage(int locationId);
+        Task<List<TransactionEntryResponse>> CreateTransaction(TransactionRequest request);
+        Task<FieldFrequencyResponse> GetLastReadings(int locationId);
+        Task<FieldFrequencyResponse> MTDAverage(int locationId);
         Task<List<AvgResponse>> PreviousMonthAverage(int locationId);
     }
 }

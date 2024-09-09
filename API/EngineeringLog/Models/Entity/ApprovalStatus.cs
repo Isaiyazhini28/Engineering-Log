@@ -1,6 +1,5 @@
 ﻿namespace EngineeringLog.Models.Entity
 {
-
     public enum ApprovalStatus
     {
         Open=1,

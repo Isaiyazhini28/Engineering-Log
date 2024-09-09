@@ -6,6 +6,5 @@ namespace EngineeringLog.Services.IServices
     {
         Task<List<BusinessUnitResponse>> GetBusinessUnitsByCountryIdAsync(string countryId);
         Task<List<PlantResponse>> GetPlantsByBusinessUnitIdAsync(string businessUnitId);
-
     }
 }

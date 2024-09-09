@@ -18,7 +18,6 @@ namespace EngineeringLog.Models.Entity
         public DateTime? ActionAt { get; set; }
         public string Remarks { get; set; }
         public ICollection<TransactionValues> TransactionValues { get; set; }
-
     }
 }
 
