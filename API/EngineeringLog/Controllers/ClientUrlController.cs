@@ -16,6 +16,7 @@ namespace EngineeringLog.Controllers
             urlService = ClientUrlService;
 
         }
+
         [HttpGet("Businessunits")]
         public async Task<ActionResult<List<BusinessUnitResponse>>> GetBusinessUnitsByCountryId(string countryId)
         {
@@ -28,6 +29,7 @@ namespace EngineeringLog.Controllers
 
             return Ok(businessUnits);
         }
+
         [HttpGet("Plants")]
         public async Task<ActionResult<List<PlantResponse>>> GetPlantsByBusinessUnitId(string businessUnitId)
         {

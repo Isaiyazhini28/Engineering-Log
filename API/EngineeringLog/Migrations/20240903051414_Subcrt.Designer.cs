@@ -3,6 +3,7 @@ using System;
 using EngineeringLog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EngineeringLog.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20240903051414_Subcrt")]
+    partial class Subcrt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,6 +197,9 @@ namespace EngineeringLog.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("FieldId")
                         .HasColumnType("integer");
 
@@ -259,7 +265,7 @@ namespace EngineeringLog.Migrations
                         .IsRequired();
 
                     b.HasOne("EngineeringLog.Models.Entity.TransactionEntries", "Transaction")
-                        .WithMany("TransactionValues")
+                        .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -272,11 +278,6 @@ namespace EngineeringLog.Migrations
             modelBuilder.Entity("EngineeringLog.Models.Entity.FieldMaster", b =>
                 {
                     b.Navigation("SubFields");
-                });
-
-            modelBuilder.Entity("EngineeringLog.Models.Entity.TransactionEntries", b =>
-                {
-                    b.Navigation("TransactionValues");
                 });
 #pragma warning restore 612, 618
         }
