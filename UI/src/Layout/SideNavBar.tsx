@@ -9,6 +9,11 @@ import {
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import SideNavBarButton from "./SideNavBarButton";
+import { AppWindow } from 'lucide-react';
+import { CircleHelp } from 'lucide-react';
+import { User } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { PathList } from "@/Router/router";
 
 type SideNavBarType = {
   MenuClose?: (data: boolean) => void;
@@ -23,10 +28,32 @@ export function SideNavBar({ MenuClose }: SideNavBarType) {
       Name: "EHS",
       Link: "/",
     },
+    {
+      Icon: AppWindow,
+      Name: "Report",
+      Link: PathList.DynamicGridTable,
+    },
+    {
+      Icon: CircleHelp,
+      Name: "FAQ",
+      Link: "/",
+    },
+    {
+      Icon: User,
+      Name: "Profile",
+      Link: "/",
+    },
+    {
+      Icon: LogOut,
+      Name: "Logout",
+      Link: "/",
+    },
+
+    
     
   ];
   return (
-    <div className="w-full h-full overflow-y-auto bg-SideNavBarColor text-C_White rounded-lg p-2 scroll-smooth scroll-mx-0 scroll-p-0 border-0 md:border-2">
+    <div className="w-full h-full overflow-y-auto bg-indigo-950 text-C_White rounded-lg p-2 scroll-smooth scroll-mx-0 scroll-p-0 border-0 md:border-2">
       <ul className="relative w-full h-full">
         {MenuList?.map((item, index) => (
           <li key={index} className="pt-2 group">
