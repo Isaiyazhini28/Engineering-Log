@@ -1,5 +1,6 @@
 ﻿using EngineeringLog.Models.Response;
 using EngineeringLog.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace EngineeringLog.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClientUrlController : ControllerBase
     {
         private readonly IClientUrlServices urlService;

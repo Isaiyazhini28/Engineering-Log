@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using EngineeringLog.Models.Response;
 using EngineeringLog.Services.IServices;
 using EngineeringLog.Models.Request;
+using Microsoft.AspNetCore.Authorization;
 namespace EngineeringLog.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EngineeringLogController : ControllerBase
     {
         private readonly IService EngService;

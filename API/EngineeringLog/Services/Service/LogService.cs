@@ -254,7 +254,7 @@ namespace EngineeringLog.Services.Service
                                     {
                                         FieldId = fieldGroup.Key.FieldId,
                                         SubFieldId = fieldGroup.Key.SubFieldId,
-                                        MtdAverage = fieldGroup.Average(x => x.HourAvg).ToString("F2") // Format to 2 decimal places
+                                        MtdAverage = fieldGroup.Average(x => x.HourAvg).ToString("F5") // Format to 2 decimal places
                                     }).ToListAsync();
             foreach (var field in fieldsResponse.DailyFields.Concat(fieldsResponse.MonthlyFields))
             {
@@ -275,11 +275,13 @@ namespace EngineeringLog.Services.Service
             return fieldsResponse;
         }
 
-        public async Task<List<AvgResponse>> PreviousMonthAverage(int locationId)
+        public async Task<FieldFrequencyResponse> PreviousMonthAverage(int locationId)
         {
+            var fieldsResponse = GetFields(locationId);
+
             // Calculate the start and end dates for the previous month
             var currentDate = DateTime.UtcNow;
-            var firstDayOfCurrentMonth = new DateTime(currentDate.Year, currentDate.Month, 1,0,0,0,DateTimeKind.Utc);
+            var firstDayOfCurrentMonth = new DateTime(currentDate.Year, currentDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1); // Last day of the previous month
             var firstDayOfPreviousMonth = new DateTime(lastDayOfPreviousMonth.Year, lastDayOfPreviousMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -288,16 +290,54 @@ namespace EngineeringLog.Services.Service
                                               where te.LocationId == locationId &&
                                                     te.CreatedDate >= firstDayOfPreviousMonth &&
                                                     te.CreatedDate <= lastDayOfPreviousMonth
-                                              group tv by tv.FieldId into fieldGroup
-                                              select new AvgResponse
+                                              group tv by new { tv.FieldId, tv.SubFieldId } into fieldGroup
+                                              select new
                                               {
-                                                  FieldId = fieldGroup.Key,
-                                                  SubfiledId=fieldGroup.Key,
-                                                  Average = fieldGroup.Average(x => x.HourAvg)
+                                                  FieldId = fieldGroup.Key.FieldId,
+                                                  SubFieldId = fieldGroup.Key.SubFieldId,
+                                                  PreviousMonthAverage = fieldGroup.Average(x => x.HourAvg).ToString("F5") // Format to 5 decimal places
                                               }).ToListAsync();
 
-            return previousMonthAvgData;
+            foreach (var field in fieldsResponse.DailyFields.Concat(fieldsResponse.MonthlyFields))
+            {
+                if (field.HasChild)
+                {
+                    foreach (var child in field.ChildFields)
+                    {
+                        var previousMonthAverage = previousMonthAvgData.FirstOrDefault(x => x.SubFieldId == child.Id)?.PreviousMonthAverage ?? string.Empty;
+                        child.Type = previousMonthAverage; // Assuming "Type" is used for storing the previous month average
+                    }
+                }
+                else
+                {
+                    var previousMonthAverage = previousMonthAvgData.FirstOrDefault(x => x.FieldId == field.Id)?.PreviousMonthAverage ?? string.Empty;
+                    field.Type = previousMonthAverage; // Assuming "Type" is used for storing the previous month average
+                }
+            }
+
+            return fieldsResponse;
         }
+        /*  // Calculate the start and end dates for the previous month
+          var currentDate = DateTime.UtcNow;
+          var firstDayOfCurrentMonth = new DateTime(currentDate.Year, currentDate.Month, 1,0,0,0,DateTimeKind.Utc);
+          var lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1); // Last day of the previous month
+          var firstDayOfPreviousMonth = new DateTime(lastDayOfPreviousMonth.Year, lastDayOfPreviousMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+          var previousMonthAvgData = await (from te in _dbContext.TransactionEntries
+                                            join tv in _dbContext.TransactionValues on te.Id equals tv.TransactionId
+                                            where te.LocationId == locationId &&
+                                                  te.CreatedDate >= firstDayOfPreviousMonth &&
+                                                  te.CreatedDate <= lastDayOfPreviousMonth
+                                            group tv by tv.FieldId into fieldGroup
+                                            select new AvgResponse
+                                            {
+                                                FieldId = fieldGroup.Key,
+                                                SubfiledId=fieldGroup.Key,
+                                                Average = fieldGroup.Average(x => x.HourAvg)
+                                            }).ToListAsync();
+
+          return previousMonthAvgData;
+      }*/
     }
 }
 
