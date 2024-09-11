@@ -2,9 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { createDynamicSchema, DynamicFormType } from "@/pages/ZodSchema";
 import { ArrayType, HT_Yard_Array } from "@/lib/ht-yard-array";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { createDynamicSchema, DynamicFormType } from "./ZodSchema";
 
 export function DynamicFormComp() {
   const dynamicSchema = createDynamicSchema(HT_Yard_Array);
