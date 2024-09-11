@@ -11,7 +11,7 @@ namespace EngineeringLog.Services.IServices
         Task<List<TransactionEntryResponse>> CreateTransaction(TransactionRequest request);
         Task<FieldFrequencyResponse> GetLastReadings(int locationId);
         Task<FieldFrequencyResponse> MTDAverage(int locationId);
-        Task<List<AvgResponse>> PreviousMonthAverage(int locationId);
+        Task<FieldFrequencyResponse> PreviousMonthAverage(int locationId);
     }
 }
 
