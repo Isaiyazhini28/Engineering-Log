@@ -12,6 +12,9 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { RouteObject, createBrowserRouter } from "react-router-dom";
 import Dashboard from "@/pages/dashboard";
+import Approval from "@/pages/approval";
+import Approvaltable from "@/pages/approvaltable";
+import { DataTableDemo } from "@/pages/datatable";
 
 export const data = [
   {
@@ -74,6 +77,9 @@ export const PathList = {
   Dashboard: "/",
   DynamicFormComp: "/dynamicformcomp",
   DynamicGridTable: "/dynamicgridtable",
+  Approval: "/approval",
+  Approvaltable: "/approvaltable",
+  DataTableDemo:"/",
 };
 
 const MainPage: RouteObject[] = [
@@ -85,6 +91,9 @@ const MainPage: RouteObject[] = [
       </Authenticated>
     ),
     children: [
+      { path: PathList.DataTableDemo, element: <DataTableDemo /> },
+      { path: PathList.Approval, element: <Approval /> },
+      { path: PathList.Approvaltable, element: <Approvaltable /> },
       { path: PathList.Dashboard, element: <Dashboard /> },
       { path: PathList.DynamicFormComp, element: <DynamicFormComp /> },
       { path: PathList.DynamicGridTable, element: <DynamicGridTable data={data} columns={columns} /> },

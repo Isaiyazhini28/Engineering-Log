@@ -13,6 +13,7 @@ import { AppWindow } from 'lucide-react';
 import { CircleHelp } from 'lucide-react';
 import { User } from 'lucide-react';
 import { LogOut } from 'lucide-react';
+import { ListTodo } from 'lucide-react';
 import { PathList } from "@/Router/router";
 
 type SideNavBarType = {
@@ -47,6 +48,11 @@ export function SideNavBar({ MenuClose }: SideNavBarType) {
       Icon: LogOut,
       Name: "Logout",
       Link: "/",
+    },
+    {
+      Icon: ListTodo,
+      Name: "Approval",
+      Link: PathList.Approval,
     },
 
     

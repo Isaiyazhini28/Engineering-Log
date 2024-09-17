@@ -1,4 +1,6 @@
 export type ArrayType = {
+
+  
   fieldId: number;
   Fieldname: string;
   value: number;
@@ -17,7 +19,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId:5
+    SequenceId: 5,
+    
   },
   {
     fieldId: 2,
@@ -26,7 +29,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 6
+    SequenceId: 6,
+    
   },
   {
     fieldId: 3,
@@ -35,7 +39,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 7
+    SequenceId: 7,
+    
   },
   {
     fieldId: 4,
@@ -44,7 +49,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 8
+    SequenceId: 8,
+    
   },
   {
     fieldId: 5,
@@ -53,7 +59,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 9
+    SequenceId: 9,
+    
   },
   {
     fieldId: 6,
@@ -62,7 +69,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 10
+    SequenceId: 10,
+    
   },
   {
     fieldId: 7,
@@ -71,7 +79,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 11
+    SequenceId: 11,
+    
   },
   {
     fieldId: 8,
@@ -80,7 +89,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 12
+    SequenceId: 12,
+    
   },
   {
     fieldId: 9,
@@ -89,7 +99,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 13
+    SequenceId: 13,
+    
   },
   {
     fieldId: 10,
@@ -98,7 +109,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 14
+    SequenceId: 14,
+    
   },
   {
     fieldId: 11,
@@ -107,7 +119,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 15
+    SequenceId: 15,
+    
   },
   {
     fieldId: 12,
@@ -116,7 +129,8 @@ export const HT_Yard_Array: ArrayType[] = [
     type: "float",
     transactiondataid: "int",
     transactionid: "int",
-    SequenceId: 16
+    SequenceId: 16,
+    
   },
   
   {
@@ -130,7 +144,8 @@ export const HT_Yard_Array: ArrayType[] = [
         type: "float",
         transactiondataid: "int",
         transactionid: "int",
-        SequenceId: 5
+        SequenceId: 5,
+        
       },
       {
         fieldId: 15,
@@ -139,14 +154,16 @@ export const HT_Yard_Array: ArrayType[] = [
         type: "float",
         transactiondataid: "int",
         transactionid: "int",
-        SequenceId: 6
+        SequenceId: 6,
+        
       },
     ],
     value: 0,
     type: "",
     transactiondataid: "",
     transactionid: "",
-    SequenceId: 4
+    SequenceId: 4,
+    
   },
   {
     fieldId: 16,
@@ -159,7 +176,8 @@ export const HT_Yard_Array: ArrayType[] = [
         type: "float",
         transactiondataid: "int",
         transactionid: "int",
-        SequenceId: 2
+        SequenceId: 2,
+        
       },
       {
         fieldId: 18,
@@ -168,13 +186,15 @@ export const HT_Yard_Array: ArrayType[] = [
         type: "float",
         transactiondataid: "int",
         transactionid: "int",
-        SequenceId: 3
+        SequenceId: 3,
+        
       },
     ],
     value: 0,
     type: "",
     transactiondataid: "",
     transactionid: "",
-    SequenceId: 1
+    SequenceId: 1,
+    
   },
 ];
