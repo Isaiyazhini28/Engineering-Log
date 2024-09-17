@@ -278,7 +278,7 @@ export function DataTableDemo() {
           value={remark}
           onChange={(e) => setRemark(e.target.value)}
           placeholder="Enter your remarks here..."
-          className="w-full h-25 p-2 border rounded-md"
+          className="w-full h-32 p-2 border rounded-md"
         />
         <Button
           variant="outline"
