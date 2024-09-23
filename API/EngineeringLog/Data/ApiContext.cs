@@ -22,6 +22,7 @@ namespace EngineeringLog.Data
         public DbSet<MapMaster> MapMasters { get; set; }
         public DbSet<TransactionValues> TransactionValues { get; set; }
         public DbSet<TransactionEntries> TransactionEntries { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
         public DbSet<User>Users { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

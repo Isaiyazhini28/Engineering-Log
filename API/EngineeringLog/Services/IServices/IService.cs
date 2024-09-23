@@ -12,6 +12,9 @@ namespace EngineeringLog.Services.IServices
         Task<FieldFrequencyResponse> GetLastReadings(int locationId);
         Task<FieldFrequencyResponse> MTDAverage(int locationId);
         Task<FieldFrequencyResponse> PreviousMonthAverage(int locationId);
+        Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request);
+        Task<TransactionLogResponse> GetTransactionLogById(int transactionId);
+       /* Task<ViewPageResponse> GetViewPageData(int locationId);*/
     }
 }
 
