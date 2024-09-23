@@ -17,7 +17,7 @@ namespace EngineeringLog.Models.Entity
         public int? SubFieldId { get; set; }
         public string Value { get; set; }
         public bool Reset { get; set; } = false;
-        public float HourAvg { get; set; }
+        public float Difference { get; set; }
         public float PerHourAvg { get; set; }
         public float PerMinAvg { get; set; }
     }
