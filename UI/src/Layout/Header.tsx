@@ -21,7 +21,7 @@ export function Header({ SreachBox }: Header) {
     }
   }
   return (
-    <header className="bg-HeaderBackground text-white h-10 items-center pl-2 pr-2 flex justify-between shadow-sm shadow-gray-500">
+    <header className="bg-indigo-950 text-white h-10 items-center pl-2 pr-2 flex justify-between shadow-sm shadow-gray-500">
       <Button
         onClick={() => setSideMenuOpen(true)}
         className="md:hidden p-0"

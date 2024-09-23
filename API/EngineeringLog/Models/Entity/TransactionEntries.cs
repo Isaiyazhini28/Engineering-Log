@@ -16,7 +16,7 @@ namespace EngineeringLog.Models.Entity
         public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Open;
         public string? ActionBy { get; set; }
         public DateTime? ActionAt { get; set; }
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
         public ICollection<TransactionValues> TransactionValues { get; set; }
     }
 }

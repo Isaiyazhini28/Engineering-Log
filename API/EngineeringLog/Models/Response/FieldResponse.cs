@@ -11,6 +11,6 @@ namespace EngineeringLog.Models.Response
         public FrequencyType Frequency { get; set; }
         public string Type { get; set; }
         public bool HasChild { get; set; }
-        public List<SubFieldResponse> ChildFields { get; set; }
+        public List<SubFieldResponse> ChildFields { get; set; } 
     }
 }

@@ -1,6 +1,6 @@
 
 
-import Login from "@/Pages/Login";
+import Login from "@/pages/Login";
 import { PropsWithChildren, useState } from "react";
 
 const Authenticated = ({ children }: PropsWithChildren) => {
