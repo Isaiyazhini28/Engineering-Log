@@ -1,7 +1,7 @@
 import Authenticated from "@/Authenticated/authenticated";
 import Layout from "@/Layout/Layout";
 import { DynamicFormComp } from "@/pages/DynamicFormComp";
-import { DynamicGridTable } from "@/pages/dynamicgrid";
+import { columns, data, DynamicGridTable } from "@/pages/dynamicgrid";
 
 
 import Login from "@/pages/Login";
@@ -14,63 +14,14 @@ import { RouteObject, createBrowserRouter } from "react-router-dom";
 import Dashboard from "@/pages/dashboard";
 import Approval from "@/pages/approval";
 import Approvaltable from "@/pages/approvaltable";
-import { DataTableDemo } from "@/pages/datatable";
-
-export const data = [
-  {
-    day1: "11.2",
-    day2: "23",
-    day3: "99.9",
-    day4: "45.67",
-    day5: "98.9",
-    day6: "0.22",
-  },
-  {
-    day1: "0.98",
-    day2: "-0.876",
-    day3: "0.12",
-    day4: "96.4",
-    day5: "0.9",
-    day6:"79.0",
-  },
-  
-  
-  // Add more rows as needed
-];
+import { View } from "@/pages/view";
+import { ReadingView } from "@/pages/reading";
 
 
-export const columns: ColumnDef<any>[] = [
-  {
-    header: "M3-1",
-    accessorKey: "day1",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-  {
-    header: "M3-2",
-    accessorKey: "day2",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-  {
-    header: "M3-3",
-    accessorKey: "day3",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-  {
-    header: "M3-4",
-    accessorKey: "day4",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-  {
-    header: "M3-5",
-    accessorKey: "day5",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-  {
-    header: "M3-6",
-    accessorKey: "day6",
-    cell: (info: { getValue: () => any; }) => info.getValue(),
-  },
-];
+
+
+
+
 export const PathList = {
   Home: "",
   Login: "/login",
@@ -79,7 +30,8 @@ export const PathList = {
   DynamicGridTable: "/dynamicgridtable",
   Approval: "/approval",
   Approvaltable: "/approvaltable",
-  DataTableDemo:"/",
+  View:"/view"
+  
 };
 
 const MainPage: RouteObject[] = [
@@ -91,12 +43,12 @@ const MainPage: RouteObject[] = [
       </Authenticated>
     ),
     children: [
-      { path: PathList.DataTableDemo, element: <DataTableDemo /> },
+      { path: PathList.View, element: <ReadingView /> },
       { path: PathList.Approval, element: <Approval /> },
       { path: PathList.Approvaltable, element: <Approvaltable /> },
       { path: PathList.Dashboard, element: <Dashboard /> },
       { path: PathList.DynamicFormComp, element: <DynamicFormComp /> },
-      { path: PathList.DynamicGridTable, element: <DynamicGridTable data={data} columns={columns} /> },
+      { path: PathList.DynamicGridTable, element: <DynamicGridTable  /> },
     ],
   },
   { path: PathList.Login, element: <Login /> },

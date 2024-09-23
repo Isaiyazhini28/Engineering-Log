@@ -17,21 +17,25 @@ export default function SideNavBarButton({
   MenuClose,
   ...props
 }: SideButton) {
-  const Navigate = useNavigate();
-  const MenuClick = (Link: string) => {
-    Navigate(Link);
-    if (MenuClose !== undefined) {
+  const navigate = useNavigate();
+  const menuClick = (link: string) => {
+    navigate(link);
+    if (MenuClose) {
       MenuClose(false);
     }
   };
+
   return (
     <Button
-      onClick={() => MenuClick(Link)}
-      className={cn("gap-2 w-full overflow-hidden flex justify-start", className)}
+      onClick={() => menuClick(Link)}
+      className={cn(
+        "gap-2 w-full overflow-hidden flex justify-start text-white", // Ensure both icon and text are white
+        className
+      )}
       {...props}
     >
-      <div>{Icon && <Icon />}</div>
-      <span>{children}</span>
+      <div>{Icon && <Icon className="text-white" />}</div> {/* Set icon color to white */}
+      <span>{children}</span> {/* Text will inherit the white color */}
     </Button>
   );
 }
