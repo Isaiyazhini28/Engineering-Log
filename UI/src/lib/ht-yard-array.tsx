@@ -1,6 +1,5 @@
 export type ArrayType = {
   status: string;
-
   
   fieldId: number;
   Fieldname: string;
@@ -174,7 +173,7 @@ export const HT_Yard_Array: ArrayType[] = [
     transactiondataid: "",
     transactionid: "",
     SequenceId: 14,
-    
+    status: ""
   },
   {
     fieldId: 17,
@@ -206,6 +205,6 @@ export const HT_Yard_Array: ArrayType[] = [
     transactiondataid: "",
     transactionid: "",
     SequenceId: 17,
-    
+    status: ""
   },
 ];

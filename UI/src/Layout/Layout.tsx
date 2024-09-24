@@ -13,6 +13,7 @@ export default function Layout() {
   const Navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
+
   const onSearchBoxOpen = (data: boolean) => {
     setIsOpen(data)
   }

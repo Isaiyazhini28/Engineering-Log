@@ -162,70 +162,63 @@ export function ReadingView() {
     setLogComment(""); // Clear the comment after submitting
   };
 
-  return(
-    <div className="flex h-full w-full">
-      <div className=" bg-white flex flex-col">
-        <div className=" flex-col  overflow-auto">
-          <Table className="flex-1 ">
-            <TableHeader className="bg-yellow-400 h-12 text-black">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="bg-yellow-400">
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="text-black">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-full text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex-none border-t pt-5">
-          <label className="font-semibold">Add a Comment</label>
-          <textarea
-            value={remark}
-            onChange={(e) => setRemark(e.target.value)}
-            placeholder="Enter your remarks here..."
-            className="w-full h-20 border rounded-md"
-          />
-          <div className="flex justify-end mt-2">
-            <Button
-              variant="outline"
-              className="bg-green-600 text-white border-green-400 hover:bg-green-400"
-              onClick={handleLogSubmit}
-            >
-              Submit
-            </Button>
+  return (
+    <div className="flex h-full w-full bg-gray-500">
+      <div className="flex-1 bg-white">
+        <div className="flex h-full w-full flex-col">
+          <div className="flex-1">Table
+
+          
+              <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
+                <div className="gap-2">
+                  <Table>
+                    <TableHeader className="bg-yellow-400 text-black">
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow
+                          key={headerGroup.id}
+                          className="bg-yellow-400"
+                        >
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id} className="text-black">
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                          <TableRow key={row.id}>
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length}
+                            className="h-24 text-center"
+                          >
+                            No results.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
           </div>
         </div>
       </div>
