@@ -31,6 +31,8 @@ function Approval() {
 
   const navigate = useNavigate();
 
+
+  
   const handleCardClick = (title: string) => {
     if (title === "WB MIXER RH(2)") {
       navigate("/approvaltable");
