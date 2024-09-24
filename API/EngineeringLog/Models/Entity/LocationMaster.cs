@@ -11,5 +11,6 @@ namespace EngineeringLog.Models.Entity
         public bool IsActive { get; set; } = true;
         [ForeignKey("PlantId")]
         public  string PlantId { get; set; }
+        public ICollection<FieldMaster> Fields { get; set; }
     }
 }

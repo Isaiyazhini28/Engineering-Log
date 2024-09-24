@@ -8,10 +8,10 @@ using EngineeringLog.Services.IServices;
 
 namespace EngineeringLog.Services.Service
 {
-    public class ClientUrlServices : IClientUrlServices
+    public class MasterService : IClientUrlServices
     {
         private readonly HttpClient _httpClient;
-        public ClientUrlServices(HttpClient httpClient)
+        public MasterService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }

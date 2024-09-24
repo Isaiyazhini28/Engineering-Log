@@ -15,7 +15,7 @@ builder.Services.AddDbContext<ApiContext>(options =>
 
 // 2. Add services to the container
 builder.Services.AddScoped<IService, LogService>();
-builder.Services.AddHttpClient<IClientUrlServices, ClientUrlServices>();
+builder.Services.AddHttpClient<IClientUrlServices, MasterService>();
 builder.Services.AddScoped<IHrmsAuthService, HrmsAuthService>();
 builder.Services.AddHttpClient<IHrmsAuthService, HrmsAuthService>();
 
