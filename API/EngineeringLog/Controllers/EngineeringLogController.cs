@@ -9,6 +9,7 @@ namespace EngineeringLog.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    
     public class EngineeringLogController : ControllerBase
     {
         private readonly IService EngService;
@@ -80,5 +81,34 @@ namespace EngineeringLog.Controllers
             var result = await EngService.PreviousMonthAverage(locationId);
             return Ok(result);
         }
+
+        [HttpPut("UpdateTransaction")]
+        public async Task<IActionResult> UpdateTransaction([FromBody] TransactionUpdateRequest request)
+        {
+            var response = await EngService.UpdateTransaction(request);
+            return Ok(response);
+        }
+        [HttpGet("activityLog")]
+        public async Task<IActionResult> GetTransactionLogById(int transactionId)
+        {
+            var transactionLog = await EngService.GetTransactionLogById(transactionId);
+
+            if (transactionLog == null)
+            {
+                return NotFound(new { message = "Transaction not found" });
+            }
+
+            return Ok(transactionLog);
+        }
+      /*  [HttpGet("ViewPage")]
+        public async Task<IActionResult> GetViewPageData(int locationId)
+        {
+            var result = await EngService.GetViewPageData(locationId);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }*/
     }
 }
