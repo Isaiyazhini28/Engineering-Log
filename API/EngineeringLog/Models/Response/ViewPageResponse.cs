@@ -25,7 +25,7 @@ namespace EngineeringLog.Models.Response
         public int SubFieldId { get; set; }
         public string SubFieldName { get; set; }
         public int SequenceId { get; set; }
-        public string LastTransactionValue { get; set; }
+        public string? LastTransactionValue { get; set; }
         public string? MtdAverage { get; set; }
         public string? PreviousMonthAverage { get; set; }
     }

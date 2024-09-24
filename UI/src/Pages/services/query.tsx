@@ -15,3 +15,15 @@
 //     staleTime: 5000, // Time before data is considered stale
 //   });
 // }
+
+
+import { useQuery } from "@tanstack/react-query";
+import { fetchModuleDataApi } from "./api";
+
+export function useModuleDataQuery() {
+    return useQuery({
+      queryKey: ["dashboard"],
+      queryFn: fetchModuleDataApi, // API call to fetch module data
+      staleTime: 60000, // Cache the data for 1 minute
+    });
+  }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,11 +12,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,20 +34,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { HT_Yard_Array } from "@/lib/ht-yard-array"
+} from "@/components/ui/table";
+import { HT_Yard_Array } from "@/lib/ht-yard-array";
 
 // Define the type
 export type ArrayType = {
-  fieldId: number
-  Fieldname: string
-  value: number
-  type: string
-  transactiondataid?: string
-  transactionid?: string
-  child?: ArrayType[]
-  SequenceId: number
-}
+  fieldId: number;
+  Fieldname: string;
+  value: number;
+  type: string;
+  transactiondataid?: string;
+  transactionid?: string;
+  child?: ArrayType[];
+  SequenceId: number;
+};
 
 // Sample data with status included
 const data = HT_Yard_Array.flatMap((field) => {
@@ -59,17 +59,19 @@ const data = HT_Yard_Array.flatMap((field) => {
       value: child.value,
       type: child.type,
       sequence: child.SequenceId,
-    }))
+    }));
   } else {
-    return [({
-      id: field.fieldId,
-      fieldname: field.Fieldname,
-      value: field.value,
-      type: field.type,
-      sequence: field.SequenceId,
-    })]
+    return [
+      {
+        id: field.fieldId,
+        fieldname: field.Fieldname,
+        value: field.value,
+        type: field.type,
+        sequence: field.SequenceId,
+      },
+    ];
   }
-})
+});
 
 // Dynamically create columns based on HT_Yard_Array
 export const columns: ColumnDef<any>[] = [
@@ -77,7 +79,9 @@ export const columns: ColumnDef<any>[] = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()}
+        checked={
+          table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -99,14 +103,24 @@ export const columns: ColumnDef<any>[] = [
       return field.child.map((child) => ({
         accessorKey: child.Fieldname.toLowerCase().replace(/ /g, "_"),
         header: child.Fieldname,
-        cell: ({ row }) => <div>{row.getValue(child.Fieldname.toLowerCase().replace(/ /g, "_"))}</div>,
-      }))
+        cell: ({ row }) => (
+          <div>
+            {row.getValue(child.Fieldname.toLowerCase().replace(/ /g, "_"))}
+          </div>
+        ),
+      }));
     } else {
-      return [({
-        accessorKey: field.Fieldname.toLowerCase().replace(/ /g, "_"),
-        header: field.Fieldname,
-        cell: ({ row }) => <div>{row.getValue(field.Fieldname.toLowerCase().replace(/ /g, "_"))}</div>,
-      })]
+      return [
+        {
+          accessorKey: field.Fieldname.toLowerCase().replace(/ /g, "_"),
+          header: field.Fieldname,
+          cell: ({ row }) => (
+            <div>
+              {row.getValue(field.Fieldname.toLowerCase().replace(/ /g, "_"))}
+            </div>
+          ),
+        },
+      ];
     }
   }),
   {
@@ -133,14 +147,17 @@ export const columns: ColumnDef<any>[] = [
       </DropdownMenu>
     ),
   },
-]
+];
 
 export function ApprovalTable() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [remark, setRemark] = React.useState<string>("")
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [remark, setRemark] = React.useState<string>("");
 
   const table = useReactTable({
     data,
@@ -159,148 +176,158 @@ export function ApprovalTable() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   const handleApprove = () => {
     // Implement approval logic here
-    console.log("Approved rows:", rowSelection)
-  }
+    console.log("Approved rows:", rowSelection);
+  };
 
   const handleReject = () => {
     // Implement rejection logic here
-    console.log("Rejected rows:", rowSelection)
-  }
+    console.log("Rejected rows:", rowSelection);
+  };
 
   const handleSubmitRemark = () => {
     // Implement remark submission logic here
-    console.log("Submitted remark:", remark)
-  }
+    console.log("Submitted remark:", remark);
+  };
 
   return (
     <div className="w-full h-full flex flex-col bg-yellow-100">
-    <div className="w-full h-screen flex flex-col">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter fields..."
-          value={(table.getColumn("fieldname")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("fieldname")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm bg-gray-400 placeholder-white"
-        />
-        <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="outline" className="ml-auto bg-gray-400 text-white">
-      Columns <ChevronDown className="ml-2 h-4 w-4" />
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end" className="bg-gray-400 text-white">
-    {table
-      .getAllColumns()
-      .filter((column) => column.getCanHide())
-      .map((column) => (
-        <DropdownMenuCheckboxItem
-          key={column.id}
-          className="capitalize bg-gray-400 text-white"
-          checked={column.getIsVisible()}
-          onCheckedChange={(value) => column.toggleVisibility(!!value)}
-        >
-          {column.id}
-        </DropdownMenuCheckboxItem>
-      ))}
-  </DropdownMenuContent>
-</DropdownMenu>
-
-      </div>
-      <div className="flex-1 overflow-auto">
-        <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
-          <Table>
-          <TableHeader className="bg-yellow-400 text-black">
-  {table.getHeaderGroups().map((headerGroup) => (
-    <TableRow key={headerGroup.id} className="bg-yellow-400">
-      {headerGroup.headers.map((header) => (
-        <TableHead key={header.id} className="text-black">
-          {header.isPlaceholder
-            ? null
-            : flexRender(header.column.columnDef.header, header.getContext())}
-        </TableHead>
-      ))}
-    </TableRow>
-  ))}
-</TableHeader>
-
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
+      <div className="w-full h-screen flex flex-col">
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter fields..."
+            value={
+              (table.getColumn("fieldname")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn("fieldname")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm bg-gray-400 placeholder-white"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="ml-auto bg-gray-400 text-white"
+              >
+                Columns <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-gray-400 text-white">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize bg-gray-400 text-white"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="flex-1 overflow-auto">
+          <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
+            <Table>
+              <TableHeader className="bg-yellow-400 text-black">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id} className="bg-yellow-400">
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id} className="text-black">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-      <div className="flex items-center justify-between py-4 border-t">
-      <div className="flex justify-end w-full gap-1">
-  
+                ))}
+              </TableHeader>
 
-  <Button
-    variant="outline"
-    size="sm"
-    onClick={handleApprove}
-    disabled={Object.keys(rowSelection).length === 0}
-    className="bg-green-600 text-white border-green-400 hover:bg-green-400"
-  >
-    Approve
-  </Button>
-  <Button
-    variant="outline"
-    size="sm"
-    onClick={handleReject}
-    disabled={Object.keys(rowSelection).length === 0}
-    className="bg-red-500 text-white border-red-400 hover:bg-red-400 "
-  >
-    Reject
-  </Button>
-</div>
-</div>
-      <label className="font-semibold">
-        Add a Comment
-      </label>
-      <div className="py-4 border-t">
-        <textarea
-          value={remark}
-          onChange={(e) => setRemark(e.target.value)}
-          placeholder="Enter your remarks here..."
-          className="w-full h-25 p-2 border rounded-md "
-        />
-        <div className="flex justify-end w-full">
-        <Button
-          variant="outline"
-          className="mt-2 bg-green-600 text-white border-green-400 hover:bg-green-400"
-          onClick={handleSubmitRemark}
-          
-        >
-          Submit 
-        </Button>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+        <div className="flex items-center justify-between py-4 border-t">
+          <div className="flex justify-end w-full gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleApprove}
+              disabled={Object.keys(rowSelection).length === 0}
+              className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+            >
+              Approve
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReject}
+              disabled={Object.keys(rowSelection).length === 0}
+              className="bg-red-500 text-white border-red-400 hover:bg-red-400 "
+            >
+              Reject
+            </Button>
+          </div>
+        </div>
+        <label className="font-semibold">Add a Comment</label>
+        <div className="py-4 border-t">
+          <textarea
+            value={remark}
+            onChange={(e) => setRemark(e.target.value)}
+            placeholder="Enter your remarks here..."
+            className="w-full h-25 p-2 border rounded-md "
+          />
+          <div className="flex justify-end w-full">
+            <Button
+              variant="outline"
+              className="mt-2 bg-green-600 text-white border-green-400 hover:bg-green-400"
+              onClick={handleSubmitRemark}
+            >
+              Submit
+            </Button>
+          </div>
         </div>
       </div>
     </div>
-    </div>
-  )
+  );
 }
 export default ApprovalTable;

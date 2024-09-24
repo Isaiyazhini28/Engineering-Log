@@ -1,21 +1,21 @@
 import Authenticated from "@/Authenticated/authenticated";
 import Layout from "@/Layout/Layout";
-import { DynamicFormComp } from "@/pages/DynamicFormComp";
-import { columns, data, DynamicGridTable } from "@/pages/dynamicgrid";
+import { DynamicFormComp } from "@/Pages/DynamicFormComp";
+import { columns, data, DynamicGridTable } from "@/Pages/dynamicgrid";
 
 
-import Login from "@/pages/Login";
+import Login from "@/Pages/Login";
 import { ColumnDef } from "@tanstack/react-table";
 
 
 
 
 import { RouteObject, createBrowserRouter } from "react-router-dom";
-import Dashboard from "@/pages/dashboard";
-import Approval from "@/pages/approval";
-import Approvaltable from "@/pages/approvaltable";
-import { View } from "@/pages/view";
-import { ReadingView } from "@/pages/reading";
+import Dashboard from "@/Pages/dashboard";
+import Approval from "@/Pages/approval";
+import Approvaltable from "@/Pages/approvaltable";
+import { View } from "@/Pages/view";
+import { ReadingView } from "@/Pages/reading";
 
 
 
@@ -23,8 +23,8 @@ import { ReadingView } from "@/pages/reading";
 
 
 export const PathList = {
-  Home: "",
-  Login: "/login",
+  Home: "/",
+  Login: "/",
   Dashboard: "/",
   DynamicFormComp: "/dynamicformcomp",
   DynamicGridTable: "/dynamicgridtable",

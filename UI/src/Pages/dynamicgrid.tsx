@@ -13,14 +13,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  CalendarIcon,
-  ChevronDown,
-  MoreHorizontal,
-} from "lucide-react";
+import { CalendarIcon, ChevronDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -49,6 +43,15 @@ import {
 import { HT_Yard_Array } from "@/lib/ht-yard-array";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Define the type
 export type ArrayType = {
@@ -95,32 +98,9 @@ const statusMap: Record<string, string> = {
   Completed: "Completed",
   Process: "In Progress",
   Delete: "Deleted",
-  
 };
 
 export const columns: ColumnDef<any>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="text-white border-white"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   ...HT_Yard_Array.flatMap((field) => {
     // Flatten child fields if they exist
     if (field.child) {
@@ -353,8 +333,9 @@ export function DynamicGridTable() {
             </div>
           </div>
         </div>
+
         <div className="flex-1 overflow-auto">
-          <div className="min-w-full h-full overflow-auto bg-indigo-950">
+          <div className="min-w-full max-h-96 overflow-auto bg-indigo-950">
             <Table>
               <TableHeader className="bg-yellow-400 text-black">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -404,6 +385,23 @@ export function DynamicGridTable() {
             </Table>
           </div>
         </div>
+
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

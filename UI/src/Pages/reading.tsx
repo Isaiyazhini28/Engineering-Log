@@ -126,6 +126,7 @@ export const columns: ColumnDef<any>[] = [
     ),
   },
 ];
+
 export function ReadingView() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -160,30 +161,153 @@ export function ReadingView() {
     console.log("Log comment submitted:", logComment);
     setLogComment(""); // Clear the comment after submitting
   };
-  
+
   return (
     <div className="flex h-full w-full bg-gray-500">
       <div className="flex-1 bg-white">
         <div className="flex h-full w-full flex-col">
           <div className="flex-1">Table
+
           
+              <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
+                <div className="gap-2">
+                  <Table>
+                    <TableHeader className="bg-yellow-400 text-black">
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow
+                          key={headerGroup.id}
+                          className="bg-yellow-400"
+                        >
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id} className="text-black">
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody>
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                          <TableRow key={row.id}>
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length}
+                            className="h-24 text-center"
+                          >
+                            No results.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
           </div>
-          <div className="h-40">Comment Box</div>
         </div>
       </div>
-      <div className="w-80 bg-red-500">
-        <div className="flex h-full w-full flex-col">
-            <div className="h-16 bg-gray-600">
-                Header
-            </div>
-            <div className="flex-1 bg-green-400">
-                Main
-            </div>
-            <div className="h-16 bg-purple-400">
-                Comment Box and Button
-            </div>
+      {/* <div className=" flex-initial w-1/4">  */}
+     <div className="">
+      <div className="flex h-full w-full flex-col">
+        <div className="h-12 bg-yellow-400 text-black flex justify-center items-center">ACTIVITY LOG</div>
+        <div className="flex-1 mr-5 ml-5 p-2 overflow-auto">
+
+              <label>Transaction ID</label>
+              <Input />
+              <label>Created By</label>
+              <Input />
+              <label>Created On</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+              <label>Updated fields</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+              <label>Updated fields</label>
+              <Input />
+            
         </div>
-      </div>
+          {/* <Card className="bg-indigo-950 text-white mr-5 ml-5 overflow-hidden">
+            
+              <label>Transaction ID</label>
+              <Input />
+              <label>Created By</label>
+              <Input />
+              <label>Created On</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+            
+            <CardFooter className="flex flex-col gap-1">
+              <label className="flex justify-start">Comment</label>
+              <textarea
+                value={logComment}
+                onChange={(e) => setLogComment(e.target.value)}
+                placeholder="Enter your comment here..."
+                className="w-full h-20 p-2 border rounded-md"
+              />
+              <div className="flex justify-end w-full">
+                <Button
+                  variant="outline"
+                  className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+                  onClick={handleLogSubmit}
+                >
+                  Submit
+                </Button>
+              </div>
+            </CardFooter>
+          </Card> */}
+         <div className="  mr-5 ml-5">
+
+  <div className="flex  flex-col p-3">
+    <div className="relative flex-grow">
+      <textarea
+        value={logComment}
+        onChange={(e) => setLogComment(e.target.value)}
+        placeholder="Enter your comment here..."
+        className="w-full h-11 p-2 border rounded-md resize-none pr-14" 
+      />
+      <Button
+        variant="outline"
+        className="absolute right-0   bg-green-600 text-white border-green-400 hover:bg-green-400 h-11 "
+        onClick={handleLogSubmit}
+      >
+        Send
+      </Button>
     </div>
-  );
+  </div>
+</div>
+
+
+          </div>
+        </div> 
+        
+     </div>
+     
+  
+  
+          );
 }
