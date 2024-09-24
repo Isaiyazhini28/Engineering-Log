@@ -9,11 +9,11 @@ namespace EngineeringLog.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ClientUrlController : ControllerBase
+    public class MasterController : ControllerBase
     {
         private readonly IClientUrlServices urlService;
 
-        public ClientUrlController(IClientUrlServices ClientUrlService)
+        public MasterController(IClientUrlServices ClientUrlService)
         {
             urlService = ClientUrlService;
 
