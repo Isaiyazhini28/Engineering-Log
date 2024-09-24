@@ -7,10 +7,12 @@ import {
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
-import { Module_Array } from "@/lib/module-array"; // Import the Module_Array
+import { useHtYardStore } from "@/store/store";
 
 function Dashboard() {
   const navigate = useNavigate();
+
+  const DashboardData=useHtYardStore((state)=>state.HtYard)
 
   const handleCardClick = (title: string) => {
     if (title === "WB MIXER RH(2)") {
@@ -28,7 +30,7 @@ function Dashboard() {
         </div>
       </div>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 overflow-auto">
-        {Module_Array.map((module, index) => (
+        {DashboardData.map((module, index) => (
           <Card
             key={index}
             className="w-full bg-yellow-400 cursor-pointer"

@@ -1,22 +1,29 @@
 import { Header } from "@/Layout/Header";
 import { SideNavBar } from "@/Layout/SideNavBar";
 import { CardContent } from "@/components/ui/card";
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Loader } from "@/components/loader";
+import { useGetDashboardQuery } from "@/services/query";
+import { useHtYardStore } from "@/store/store";
 
 export const KEY_USER_SESSIONS = import.meta.env.VITE_SSO_KEY_NAME;
 export const KEY_USER_DOMAIN = import.meta.env.VITE_SSO_DOMAIN;
 
-
 export default function Layout() {
   const Navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-
+  const { data: DashboardData } = useGetDashboardQuery();
 
   const onSearchBoxOpen = (data: boolean) => {
-    setIsOpen(data)
-  }
+    setIsOpen(data);
+  };
+  const setDashboardData = useHtYardStore((state) => state.setHtYard);
+  useEffect(() => {
+    if (DashboardData?.length > 0) {
+      setDashboardData(DashboardData);
+    }
+  }, [DashboardData]);
 
   return (
     <div className="flex flex-col h-screen bg-white">

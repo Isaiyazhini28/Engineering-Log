@@ -24,3 +24,8 @@ export const loginUserApi = async (data: any) => {
     return response.data;
 
 };
+
+export const GetDashboardAPI=async()=>{
+  const res=(await axiosMarketMapping.get("/EngineeringLog/dashboard")).data
+  return res
+}

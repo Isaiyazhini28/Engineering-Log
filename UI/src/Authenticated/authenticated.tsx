@@ -1,4 +1,5 @@
-import Login from "@/Pages/Login";
+
+import LoginPage from "@/pages/Login";
 import { setAuthIncerceptor } from "@/services/api";
 import { PropsWithChildren, useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
@@ -20,7 +21,7 @@ const Authenticated = ({ children }: PropsWithChildren<object>) => {
   }, []);
 
   // Render Login component if no cookie is found, otherwise render children
-  return !cookie ? <Login /> : <>{children}</>;
+  return !cookie ? <LoginPage /> : <>{children}</>;
 };
 
 export default Authenticated;
