@@ -7,17 +7,25 @@ import {
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
-import { useHtYardStore } from "@/store/store";
+import { useFieldsStore, useHtYardStore, useSelectedLocationIdStore } from "@/store/store";
+import { useEffect, useState } from "react";
+import { useGetFieldsBasedOnLocationIdQuery } from "@/services/query";
 
 function Dashboard() {
   const navigate = useNavigate();
 
+  const [selectedLoactionId,setSelectedLocationId]=useState(0)
+  const setLocationId=useSelectedLocationIdStore((state)=>state.setLocationId)
+
+
+
   const DashboardData=useHtYardStore((state)=>state.HtYard)
 
-  const handleCardClick = (title: string) => {
-    if (title === "WB MIXER RH(2)") {
+
+
+  const handleCardClick = (LocationDetails: any) => {
+    setLocationId(LocationDetails.id)
       navigate("/dynamicformcomp");
-    }
   };
 
   return (
@@ -34,7 +42,7 @@ function Dashboard() {
           <Card
             key={index}
             className="w-full bg-yellow-400 cursor-pointer"
-            onClick={() => handleCardClick(module.name)}
+            onClick={() => handleCardClick(module)}
           >
             <CardHeader className="flex items-center justify-center text-blue-950">
               <CardTitle>{module.name}</CardTitle>

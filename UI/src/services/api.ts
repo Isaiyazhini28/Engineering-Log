@@ -7,13 +7,13 @@ export const axiosLogin = axios.create({
   baseURL: "https://primeqas.nipponpaint.co.in/log/api/Auth", // Base URL for your authentication API
 });
 
-export const axiosMarketMapping=axios.create({
+export const axiosEngineeringLog=axios.create({
   baseURL: "https://primeqas.nipponpaint.co.in/log/api",
 
 })
 
 export const setAuthIncerceptor = (token: string) => {
-  axiosMarketMapping.defaults.headers.Authorization = `Bearer ${token}`;
+  axiosEngineeringLog.defaults.headers.Authorization = `Bearer ${token}`;
 };
 
 // Function to handle the login request
@@ -26,6 +26,20 @@ export const loginUserApi = async (data: any) => {
 };
 
 export const GetDashboardAPI=async()=>{
-  const res=(await axiosMarketMapping.get("/EngineeringLog/dashboard")).data
+  const res=(await axiosEngineeringLog.get("/EngineeringLog/dashboard")).data
+  return res
+};
+
+export const GetFieldsBasedOnLocationIdAPI=async(params:any)=>{
+  const res=(await axiosEngineeringLog.get("EngineeringLog/form",{
+    params,
+    paramsSerializer:{indexes:true}
+  })).data
   return res
 }
+
+
+export const InsertDataApi = async (data:any,locationID:number)=> {
+  const Res=(await axiosEngineeringLog.post("EngineeringLog/form?locationId="+locationID,data))
+  return Res
+};

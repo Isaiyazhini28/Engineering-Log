@@ -4,51 +4,51 @@ import { ArrayType, HT_Yard_Array } from "@/lib/ht-yard-array";
 export const createDynamicSchema = (fields: ArrayType[]) => {
   const schemaShape = fields.reduce((acc, field) => {
     // Validate the main input field
-    acc[`${field.Fieldname}_1`] = z
+    acc[`${field.name}_1`] = z
       .string()
-      .min(1, { message: `${field.Fieldname}  should not be empty` })
+      .min(1, { message: `${field.name}  should not be empty` })
       .refine((val) => !isNaN(Number(val)), {
-        message: `${field.Fieldname}  should be a number`,
+        message: `${field.name}  should be a number`,
       });
 
     // Validate the second input field
-    acc[`${field.Fieldname}_2`] = z
+    acc[`${field.name}_2`] = z
       .string()
-      .min(1, { message: `${field.Fieldname} should not be empty` })
+      .min(1, { message: `${field.name} should not be empty` })
       .refine((val) => !isNaN(Number(val)), {
-        message: `${field.Fieldname}  should be a number`,
+        message: `${field.name}  should be a number`,
       });
 
     // Validate the third input field
-    acc[`${field.Fieldname}_3`] = z
+    acc[`${field.name}_3`] = z
       .string()
-      .min(1, { message: `${field.Fieldname} should not be empty` })
+      .min(1, { message: `${field.name} should not be empty` })
       .refine((val) => !isNaN(Number(val)), {
-        message: `${field.Fieldname} should be a number`,
+        message: `${field.name} should be a number`,
       });
 
     // Validate child fields if any
     if (field.child) {
       field.child.forEach((childField) => {
-        acc[`${field.Fieldname}.${childField.Fieldname}_1`] = z
+        acc[`${field.name}.${childField.name}_1`] = z
           .string()
-          .min(1, { message: `${childField.Fieldname} should not be empty` })
+          .min(1, { message: `${childField.name} should not be empty` })
           .refine((val) => !isNaN(Number(val)), {
-            message: `${childField.Fieldname} should be a number`,
+            message: `${childField.name} should be a number`,
           });
 
-        acc[`${field.Fieldname}.${childField.Fieldname}_2`] = z
+        acc[`${field.name}.${childField.name}_2`] = z
           .string()
-          .min(1, { message: `${childField.Fieldname}  should not be empty` })
+          .min(1, { message: `${childField.name}  should not be empty` })
           .refine((val) => !isNaN(Number(val)), {
-            message: `${childField.Fieldname} should be a number`,
+            message: `${childField.name} should be a number`,
           });
 
-        acc[`${field.Fieldname}.${childField.Fieldname}_3`] = z
+        acc[`${field.name}.${childField.name}_3`] = z
           .string()
-          .min(1, { message: `${childField.Fieldname} should not be empty` })
+          .min(1, { message: `${childField.name} should not be empty` })
           .refine((val) => !isNaN(Number(val)), {
-            message: `${childField.Fieldname} should be a number`,
+            message: `${childField.name} should be a number`,
           });
       });
     }
