@@ -32,16 +32,16 @@
 
 //   const formLoad = (data: ArrayType, parentPath = "") => {
 //     const currentPath = parentPath
-//       ? `${parentPath}.${data.Fieldname}`
-//       : data.Fieldname;
+//       ? `${parentPath}.${data.name}`
+//       : data.name;
 
 //     return (
-//       <div className="grid grid-cols-1 gap-2" key={data.Fieldname}>
+//       <div className="grid grid-cols-1 gap-2" key={data.name}>
 //         {data.child && data.child.length > 0 ? (
 //           <div className="col-span-3 grid grid-cols-1 items-start">
 //             <div className="grid grid-cols-6 gap-2">
 //               <label className="w-full h-full flex items-center justify-start">
-//                 {data.Fieldname}
+//                 {data.name}
 //               </label>
 //             </div>
 //             <div className="col-span-1 grid grid-cols-1 gap-2">
@@ -51,7 +51,7 @@
 //         ) : (
 //           <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
 //             <label className="w-full h-full flex items-center justify-start">
-//               {data.Fieldname}
+//               {data.name}
 //             </label>
 //             <div>
 //               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">
@@ -142,46 +142,68 @@ import { Button } from "@/components/ui/button";
 import { createDynamicSchema, DynamicFormType } from "@/pages/ZodSchema";
 import { ArrayType, HT_Yard_Array } from "@/lib/ht-yard-array";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useGetFieldsBasedOnLocationIdQuery } from "@/services/query";
+import { useSelectedLocationIdStore } from "@/store/store";
+import { useEffect, useState } from "react";
 
 export function DynamicFormComp() {
-  const dynamicSchema = createDynamicSchema(HT_Yard_Array);
+  
+  const selectedLoactionId=useSelectedLocationIdStore((state)=>state.LocationId)
+  const {data:FieldsData}=useGetFieldsBasedOnLocationIdQuery({LocationId:selectedLoactionId})
+  
+  
+  
 
+  
+  const onSubmit = (data: DynamicFormType) => {
+    console.log(data, "form Data");
+  };
+  const [dailyFieldsArray,setDailyFieldsArray]=useState([])
+  const [monthlyFieldsArray,setMonthlyFieldsArray]=useState([])
+  const dynamicSchema = createDynamicSchema(dailyFieldsArray);
   const formMethods = useForm<DynamicFormType>({
     resolver: zodResolver(dynamicSchema),
     mode: "onChange",
     reValidateMode: "onChange",
   });
-
   const { handleSubmit, control, formState } = formMethods;
   const { errors } = formState;
 
-  const onSubmit = (data: DynamicFormType) => {
-    console.log(data, "form Data");
-  };
-
+  useEffect(()=>{
+    if(FieldsData?.dailyFields?.length>0)
+    {
+      setDailyFieldsArray(FieldsData.dailyFields)
+    }
+    if(FieldsData?.monthlyFields?.length>0)
+    {
+      setMonthlyFieldsArray(FieldsData.monthlyFields)
+    }
+  },[FieldsData])
   
 
-  const formLoad = (data: ArrayType, parentPath = "") => {
+  console.log(dailyFieldsArray,"dailyFieldsArray")
+
+  const formLoad = (data: any, parentPath = "") => {
     const currentPath = parentPath
-      ? `${parentPath}.${data.Fieldname}`
-      : data.Fieldname;
+      ? `${parentPath}.${data.name}`
+      : data.name;
       return (
-        <div className="grid grid-cols-1 gap-2" key={data.Fieldname}>
-          {data.child && data.child.length > 0 ? (
+        <div className="grid grid-cols-1 gap-2" key={data.name}>
+          {data.childFields && data.childFields.length > 0 ? (
             <div className="col-span-3 grid grid-cols-1 items-start">
               <div className="grid grid-cols-6 gap-2">
                 <label className="w-full h-full flex items-center justify-start text-white">
-                  {data.Fieldname}
+                  {data.name}
                 </label>
               </div>
               <div className="col-span-1 grid grid-cols-1 gap-2">
-                {data.child.map((C_Item) => formLoad(C_Item, currentPath))}
+                {data.childFields.map((C_Item:any) => formLoad(C_Item, currentPath))}
               </div>
             </div>
           ) : (
             <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
               <label className="w-full h-full flex items-center justify-start text-white">
-                {data.Fieldname}
+                {data.name}
               </label>
               <div>
                 <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
@@ -247,7 +269,7 @@ export function DynamicFormComp() {
                   <div className="p-2">MTD AVERAGE</div>
                   <div className="p-2">LAST MONTH AVERAGE</div>
                 </div>
-                {HT_Yard_Array.map((item) => formLoad(item))}
+                {dailyFieldsArray?.map((item) => formLoad(item))}
                 <div className="flex justify-end mt-3">
                   <Button
                     type="submit"
@@ -292,16 +314,16 @@ export function DynamicFormComp() {
 
 //   const formLoad = (data: ArrayType, parentPath = "") => {
 //     const currentPath = parentPath
-//       ? `${parentPath}.${data.Fieldname}`
-//       : data.Fieldname;
+//       ? `${parentPath}.${data.name}`
+//       : data.name;
 
 //     return (
-//       <div className="grid grid-cols-1 gap-2" key={data.Fieldname}>
+//       <div className="grid grid-cols-1 gap-2" key={data.name}>
 //         {data.child && data.child.length > 0 ? (
 //           <div className="col-span-3 grid grid-cols-1 items-start">
 //             <div className="grid grid-cols-6 gap-2">
 //               <label className="w-full h-full flex items-center justify-start">
-//                 {data.Fieldname}
+//                 {data.name}
 //               </label>
 //             </div>
 //             <div className="col-span-1 grid grid-cols-1 gap-2">
@@ -311,7 +333,7 @@ export function DynamicFormComp() {
 //         ) : (
 //           <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
 //             <label className="w-full h-full flex items-center justify-start">
-//               {data.Fieldname}
+//               {data.name}
 //             </label>
 //             <div>
 //               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">

@@ -2,7 +2,7 @@
 // import { customerTypeMasterApi } from "./api";
 
 import { useQuery } from "@tanstack/react-query";
-import { GetDashboardAPI } from "./api";
+import { GetDashboardAPI, GetFieldsBasedOnLocationIdAPI  } from "./api";
 
 // // queryClient.ts (or wherever you initialize your QueryClient)
 export function useGetDashboardQuery() {
@@ -13,4 +13,16 @@ export function useGetDashboardQuery() {
     gcTime: Infinity,
   });
 }
+
+export function useGetFieldsBasedOnLocationIdQuery(data:any) {
+  return useQuery({
+    queryKey: ["Get Fields Based On Location Id",data.LocationId],
+    queryFn: () => GetFieldsBasedOnLocationIdAPI(data),
+    staleTime: Infinity,
+    gcTime: Infinity,
+    enabled:(data.LocationId!==0)
+  });
+}
+
+
 

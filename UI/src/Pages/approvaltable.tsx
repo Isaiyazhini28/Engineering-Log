@@ -40,7 +40,7 @@ import { HT_Yard_Array } from "@/lib/ht-yard-array";
 // Define the type
 export type ArrayType = {
   fieldId: number;
-  Fieldname: string;
+  name: string;
   value: number;
   type: string;
   transactiondataid?: string;
@@ -55,7 +55,7 @@ const data = HT_Yard_Array.flatMap((field) => {
   if (field.child) {
     return field.child.map((child) => ({
       id: child.fieldId,
-      fieldname: child.Fieldname,
+      name: child.name,
       value: child.value,
       type: child.type,
       sequence: child.SequenceId,
@@ -64,7 +64,7 @@ const data = HT_Yard_Array.flatMap((field) => {
     return [
       {
         id: field.fieldId,
-        fieldname: field.Fieldname,
+        name: field.name,
         value: field.value,
         type: field.type,
         sequence: field.SequenceId,
@@ -101,22 +101,22 @@ export const columns: ColumnDef<any>[] = [
     // Flatten child fields if they exist
     if (field.child) {
       return field.child.map((child) => ({
-        accessorKey: child.Fieldname.toLowerCase().replace(/ /g, "_"),
-        header: child.Fieldname,
+        accessorKey: child.name.toLowerCase().replace(/ /g, "_"),
+        header: child.name,
         cell: ({ row }) => (
           <div>
-            {row.getValue(child.Fieldname.toLowerCase().replace(/ /g, "_"))}
+            {row.getValue(child?.name?.toLowerCase().replace(/ /g, "_"))}
           </div>
         ),
       }));
     } else {
       return [
         {
-          accessorKey: field.Fieldname.toLowerCase().replace(/ /g, "_"),
-          header: field.Fieldname,
+          accessorKey: field?.name.toLowerCase().replace(/ /g, "_"),
+          header: field.name,
           cell: ({ row }) => (
             <div>
-              {row.getValue(field.Fieldname.toLowerCase().replace(/ /g, "_"))}
+              {row.getValue(field?.name.toLowerCase().replace(/ /g, "_"))}
             </div>
           ),
         },
@@ -200,10 +200,10 @@ export function ApprovalTable() {
           <Input
             placeholder="Filter fields..."
             value={
-              (table.getColumn("fieldname")?.getFilterValue() as string) ?? ""
+              (table.getColumn("name")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) =>
-              table.getColumn("fieldname")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm bg-gray-400 placeholder-white"
           />
