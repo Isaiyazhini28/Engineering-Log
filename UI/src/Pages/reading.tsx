@@ -1,0 +1,320 @@
+"use client";
+
+import * as React from "react";
+import {
+  ColumnDef,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { HT_Yard_Array } from "@/lib/ht-yard-array";
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+export type ArrayType = {
+  fieldId: number;
+  Fieldname: string;
+  value: number;
+  type: string;
+  transactiondataid?: string;
+  transactionid?: string;
+  child?: ArrayType[];
+  SequenceId: number;
+};
+
+const data = HT_Yard_Array.flatMap((field) => {
+  if (field.child) {
+    return field.child.map((child) => ({
+      id: child.fieldId,
+      fieldname: child.Fieldname,
+      value: child.value,
+      type: child.type,
+      sequence: child.SequenceId,
+    }));
+  } else {
+    return [
+      {
+        id: field.fieldId,
+        fieldname: field.Fieldname,
+        value: field.value,
+        type: field.type,
+        sequence: field.SequenceId,
+      },
+    ];
+  }
+});
+
+export const columns: ColumnDef<any>[] = [
+  ...HT_Yard_Array.flatMap((field) => {
+    if (field.child) {
+      return field.child.map((child) => ({
+        accessorKey: child.Fieldname.toLowerCase().replace(/ /g, "_"),
+        header: child.Fieldname,
+        cell: ({ row }) => (
+          <div>
+            {row.getValue(child.Fieldname.toLowerCase().replace(/ /g, "_"))}
+          </div>
+        ),
+      }));
+    } else {
+      return [
+        {
+          accessorKey: field.Fieldname.toLowerCase().replace(/ /g, "_"),
+          header: field.Fieldname,
+          cell: ({ row }) => (
+            <div>
+              {row.getValue(field.Fieldname.toLowerCase().replace(/ /g, "_"))}
+            </div>
+          ),
+        },
+      ];
+    }
+  }),
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => navigator.clipboard.writeText(row.original.id)}
+          >
+            Copy Field ID
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>View details</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+];
+
+export function ReadingView() {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [remark, setRemark] = React.useState<string>("");
+  const [logComment, setLogComment] = React.useState<string>("");
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      columnVisibility,
+    },
+  });
+
+  const handleApprove = () => {
+    console.log("Approved rows");
+  };
+
+  const handleReject = () => {
+    console.log("Rejected rows");
+  };
+
+  const handleLogSubmit = () => {
+    console.log("Log comment submitted:", logComment);
+    setLogComment(""); // Clear the comment after submitting
+  };
+
+  return(
+    <div className="flex h-full w-full">
+      <div className=" bg-white flex flex-col">
+        <div className=" flex-col  overflow-auto">
+          <Table className="flex-1 ">
+            <TableHeader className="bg-yellow-400 h-12 text-black">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="bg-yellow-400">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="text-black">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-full text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="flex-none border-t pt-5">
+          <label className="font-semibold">Add a Comment</label>
+          <textarea
+            value={remark}
+            onChange={(e) => setRemark(e.target.value)}
+            placeholder="Enter your remarks here..."
+            className="w-full h-20 border rounded-md"
+          />
+          <div className="flex justify-end mt-2">
+            <Button
+              variant="outline"
+              className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+              onClick={handleLogSubmit}
+            >
+              Submit
+            </Button>
+          </div>
+        </div>
+      </div>
+      {/* <div className=" flex-initial w-1/4">  */}
+     <div className="">
+      <div className="flex h-full w-full flex-col">
+        <div className="h-12 bg-yellow-400 text-black flex justify-center items-center">ACTIVITY LOG</div>
+        <div className="flex-1 mr-5 ml-5 p-2 overflow-auto">
+
+              <label>Transaction ID</label>
+              <Input />
+              <label>Created By</label>
+              <Input />
+              <label>Created On</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+              <label>Updated fields</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+              <label>Updated fields</label>
+              <Input />
+            
+        </div>
+          {/* <Card className="bg-indigo-950 text-white mr-5 ml-5 overflow-hidden">
+            
+              <label>Transaction ID</label>
+              <Input />
+              <label>Created By</label>
+              <Input />
+              <label>Created On</label>
+              <Input />
+              <label>Revised On</label>
+              <Input />
+              <label>Revised By</label>
+              <Input />
+            
+            <CardFooter className="flex flex-col gap-1">
+              <label className="flex justify-start">Comment</label>
+              <textarea
+                value={logComment}
+                onChange={(e) => setLogComment(e.target.value)}
+                placeholder="Enter your comment here..."
+                className="w-full h-20 p-2 border rounded-md"
+              />
+              <div className="flex justify-end w-full">
+                <Button
+                  variant="outline"
+                  className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+                  onClick={handleLogSubmit}
+                >
+                  Submit
+                </Button>
+              </div>
+            </CardFooter>
+          </Card> */}
+         <div className="  mr-5 ml-5">
+
+  <div className="flex  flex-col p-3">
+    <div className="relative flex-grow">
+      <textarea
+        value={logComment}
+        onChange={(e) => setLogComment(e.target.value)}
+        placeholder="Enter your comment here..."
+        className="w-full h-11 p-2 border rounded-md resize-none pr-14" 
+      />
+      <Button
+        variant="outline"
+        className="absolute right-0   bg-green-600 text-white border-green-400 hover:bg-green-400 h-11 "
+        onClick={handleLogSubmit}
+      >
+        Send
+      </Button>
+    </div>
+  </div>
+</div>
+
+
+          </div>
+        </div> 
+        
+     </div>
+     
+  
+  
+          );
+}
