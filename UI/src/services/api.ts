@@ -26,20 +26,44 @@ export const loginUserApi = async (data: any) => {
 };
 
 export const GetDashboardAPI=async()=>{
-  const res=(await axiosEngineeringLog.get("/EngineeringLog/dashboard")).data
+  const res=(await axiosEngineeringLog.get("/Dashboard/location?frequency=1")).data
+  return res
+};
+
+export const GetDashboardMonthlyAPI=async()=>{
+  const res=(await axiosEngineeringLog.get("/Dashboard/location?frequency=2")).data
   return res
 };
 
 export const GetFieldsBasedOnLocationIdAPI=async(params:any)=>{
-  const res=(await axiosEngineeringLog.get("EngineeringLog/form",{
+  const res=(await axiosEngineeringLog.get("Dashboard/fields",{
     params,
     paramsSerializer:{indexes:true}
   })).data
   return res
 }
 
+export const DynamicFormInsertAPI = async (data: any) => {
+  return await axiosEngineeringLog.post("/Dashboard/Form", data);
+};
+
+
 
 export const InsertDataApi = async (data:any,locationID:number)=> {
-  const Res=(await axiosEngineeringLog.post("EngineeringLog/form?locationId="+locationID,data))
+  const Res=(await axiosEngineeringLog.post("Dashboard/fields?locationId="+locationID,data))
   return Res
 };
+
+// export const GetFieldsBasedOnLocationIdAPI=async(params:any)=>{
+//   const res=(await axiosEngineeringLog.get("EngineeringLog/form",{
+//     params,
+//     paramsSerializer:{indexes:true}
+//   })).data
+//   return res
+// }
+
+
+// export const InsertDataApi = async (data:any,locationID:number)=> {
+//   const Res=(await axiosEngineeringLog.post("EngineeringLog/form?locationId="+locationID,data))
+//   return Res
+// };
