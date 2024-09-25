@@ -4,7 +4,7 @@ import { CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Loader } from "@/components/loader";
-import { useGetDashboardQuery } from "@/services/query";
+import { useGetDashboardMonthlyQuery, useGetDashboardQuery } from "@/services/query";
 import { useHtYardStore } from "@/store/store";
 
 export const KEY_USER_SESSIONS = import.meta.env.VITE_SSO_KEY_NAME;
@@ -14,6 +14,8 @@ export default function Layout() {
   const Navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { data: DashboardData } = useGetDashboardQuery();
+  const { data: DashboardMonthlyData } = useGetDashboardMonthlyQuery();
+
 
   const onSearchBoxOpen = (data: boolean) => {
     setIsOpen(data);
@@ -24,6 +26,15 @@ export default function Layout() {
       setDashboardData(DashboardData);
     }
   }, [DashboardData]);
+
+  const setDashboardMonthlyData = useHtYardStore((state) => state.setHtYardMonthly);
+  useEffect(() => {
+    if (DashboardMonthlyData?.length > 0) {
+      setDashboardMonthlyData(DashboardMonthlyData);
+    }
+  }, [DashboardMonthlyData]);
+
+  
 
   return (
     <div className="flex flex-col h-screen bg-white">

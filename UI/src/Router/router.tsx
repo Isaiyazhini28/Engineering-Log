@@ -8,6 +8,7 @@ import Approvaltable from "@/pages/approvaltable";
 import { ReadingView } from "@/pages/reading";
 import DynamicGridTable from "@/pages/dynamicgrid";
 import LoginPage from "@/pages/Login";
+import View from "@/pages/view";
 
 
 
@@ -16,7 +17,7 @@ import LoginPage from "@/pages/Login";
 
 export const PathList = {
   Home: "/",
-  Login: "/",
+  Login: "/login",
   Dashboard: "/",
   DynamicFormComp: "/dynamicformcomp",
   DynamicGridTable: "/dynamicgridtable",
@@ -35,7 +36,7 @@ const MainPage: RouteObject[] = [
       </Authenticated>
     ),
     children: [
-      { path: PathList.View, element: <ReadingView /> },
+      { path: PathList.View, element: <View /> },
       { path: PathList.Approval, element: <Approval /> },
       { path: PathList.Approvaltable, element: <Approvaltable /> },
       { path: PathList.Dashboard, element: <Dashboard /> },

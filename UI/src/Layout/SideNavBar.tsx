@@ -33,17 +33,17 @@ export function SideNavBar({ MenuClose }: SideNavBarType) {
     {
       Icon: CircleHelp,
       Name: "FAQ",
-      Link: "/",
+      Link: "/N",
     },
     {
       Icon: User,
       Name: "Profile",
-      Link: "/",
+      Link: "/N",
     },
     {
       Icon: LogOut,
       Name: "Logout",
-      Link: "/",
+      Link: "/N",
     },
     {
       Icon: ListTodo,
