@@ -33,7 +33,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="bg-yellow-100 h-full w-full p-2 flex flex-col">
+    <div className="bg-yellow-100 h-full w-full p-2 flex flex-col overflow-auto">
       
       <Tabs defaultValue="Daily" className="w-full">
         <div className="h-10 flex justify-start">
@@ -50,7 +50,7 @@ function Dashboard() {
             {DashboardData.map((module, index) => (
               <Card
                 key={index}
-                className="w-full bg-yellow-400 cursor-pointer"
+                className="w-full  bg-yellow-400 cursor-pointer"
                 onClick={() => handleCardClick(module)}
               >
                 <CardHeader className="flex items-center justify-center text-blue-950">

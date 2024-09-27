@@ -55,7 +55,7 @@
 
   const data = HT_Yard_Array.flatMap((field) => {
     if (field.child) {
-      return field.child.map((child) => ({
+      return field.child.map((child: { fieldId: any; name: any; value: any; type: any; SequenceId: any; }) => ({
         id: child.fieldId,
         name: child.name,
         value: child.value,
@@ -78,7 +78,7 @@
   export const columns: ColumnDef<any>[] = [
     ...HT_Yard_Array.flatMap((field) => {
       if (field.child) {
-        return field.child.map((child) => ({
+        return field.child.map((child: { name: string; }) => ({
           accessorKey: child.name.toLowerCase().replace(/ /g, "_"),
           header: child.name,
           cell: ({ row }) => (
@@ -168,14 +168,14 @@
           <div className="flex h-full w-full flex-col">
             <div className="flex-1">
 
-            <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
-                  <div className="gap-2">
-                    <Table>
+            <div className="min-w-full max-h-80 overflow-auto pb-4 bg-red-700 ">
+                  <div className="gap-10">
+                    <Table >
                       <TableHeader className="bg-yellow-400 text-black">
                         {table.getHeaderGroups().map((headerGroup) => (
                           <TableRow
                             key={headerGroup.id}
-                            className="bg-yellow-400"
+                            className="bg-yellow-400 "
                           >
                             {headerGroup.headers.map((header) => (
                               <TableHead key={header.id} className="text-black">
@@ -190,7 +190,7 @@
                           </TableRow>
                         ))}
                       </TableHeader>
-                      <TableBody>
+                      <TableBody className="pb-48">
                         {table.getRowModel().rows?.length ? (
                           table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id}>
@@ -208,7 +208,7 @@
                           <TableRow>
                             <TableCell
                               colSpan={columns.length}
-                              className="h-24 text-center"
+                              className="h-24 text-center text-black"
                             >
                               No results.
                             </TableCell>
@@ -218,14 +218,35 @@
                     </Table>
                   </div>
                 </div>
+                <label className="font-semibold mt-2 ">Add a Comment</label>{" "}
+              
+              <div className="border-t pt-2">
+                
+                <textarea
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                  placeholder="Enter your remarks here..."
+                  className="w-full h-28 p-2 border rounded-md relative flex-grow"
+                />
+              </div>
+              <div className="flex justify-end w-full mt-2">
+                <Button
+                  variant="outline"
+                  className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+                  onClick={handleApprove}
+                >
+                  Submit
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+            
         {/* <div className=" flex-initial w-1/4">  */}
       <div className="">
         <div className="flex h-full w-full flex-col">
           <div className="h-12 bg-yellow-400 text-black flex justify-center items-center">ACTIVITY LOG</div>
-          <div className="flex-1 mr-5 ml-5 p-2 overflow-auto">
+          <div className="flex-1 mr-5 ml-5 p-2 overflow-auto h-">
 
                 <label>Transaction ID</label>
                 <Input />

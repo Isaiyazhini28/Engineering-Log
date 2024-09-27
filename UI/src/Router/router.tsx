@@ -36,7 +36,7 @@ const MainPage: RouteObject[] = [
       </Authenticated>
     ),
     children: [
-      { path: PathList.View, element: <View /> },
+      { path: PathList.View, element: <ReadingView/> },
       { path: PathList.Approval, element: <Approval /> },
       { path: PathList.Approvaltable, element: <Approvaltable /> },
       { path: PathList.Dashboard, element: <Dashboard /> },
