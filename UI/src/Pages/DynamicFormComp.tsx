@@ -1,147 +1,15 @@
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { createDynamicSchema, DynamicFormType } from "@/pages/ZodSchema";
-// import { ArrayType, HT_Yard_Array } from "@/lib/ht-yard-array";
-// import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
-// import { useSubmitData } from '@/pages/services/mutation'; // Import your hooks
-// import { useFetchData } from '@/pages/services/query';
-
-// export function DynamicFormComp() {
-//   const dynamicSchema = createDynamicSchema(HT_Yard_Array);
-
-//   const formMethods = useForm<DynamicFormType>({
-//     resolver: zodResolver(dynamicSchema),
-//     mode: "onChange",
-//     reValidateMode: "onChange",
-//   });
-
-//   const { handleSubmit, control, formState } = formMethods;
-//   const { errors } = formState;
-
-//   const { data, error, isLoading } = useFetchData('/your-fetch-api-endpoint');
-//   const mutation = useSubmitData();
-
-//   if (isLoading) return <div>Loading...</div>;
-//   if (error) return <div>Error: {error.message}</div>;
-
-//   const onSubmit = (data: DynamicFormType) => {
-//     mutation.mutate(data);
-//   };
-
-//   const formLoad = (data: ArrayType, parentPath = "") => {
-//     const currentPath = parentPath
-//       ? `${parentPath}.${data.name}`
-//       : data.name;
-
-//     return (
-//       <div className="grid grid-cols-1 gap-2" key={data.name}>
-//         {data.child && data.child.length > 0 ? (
-//           <div className="col-span-3 grid grid-cols-1 items-start">
-//             <div className="grid grid-cols-6 gap-2">
-//               <label className="w-full h-full flex items-center justify-start">
-//                 {data.name}
-//               </label>
-//             </div>
-//             <div className="col-span-1 grid grid-cols-1 gap-2">
-//               {data.child.map((C_Item) => formLoad(C_Item, currentPath))}
-//             </div>
-//           </div>
-//         ) : (
-//           <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
-//             <label className="w-full h-full flex items-center justify-start">
-//               {data.name}
-//             </label>
-//             <div>
-//               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">
-//                 Last Reading
-//               </div>
-//             </div>
-//             <div className="w-full">
-//               <FormField
-//                 control={control}
-//                 name={`${currentPath}_1`}
-//                 render={({ field }) => (
-//                   <FormItem className="max-h-[65px]">
-//                     <Input
-//                       {...field}
-//                       value={field.value ?? ""}
-//                       className="w-full p-2"
-//                     />
-//                     <FormMessage>
-//                       {errors[`${currentPath}_1`] && errors[`${currentPath}_1`].message}
-//                     </FormMessage>
-//                   </FormItem>
-//                 )}
-//               />
-//             </div>
-
-//             <div>
-//               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">
-//                 difference
-//               </div>
-//             </div>
-
-//             <div>
-//               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">
-//                 Mtd avg
-//               </div>
-//             </div>
-
-//             <div>
-//               <div className="w-full max-h-[40px] bg-white text-black border rounded-[5px] p-2">
-//                 Monthly avg
-//               </div>
-//             </div>
-//             </div>
-//         )}
-//       </div>
-//     );
-//   };
-
-//   return (
-//     <div className="flex-1 flex flex-col h-full w-full bg-slate-300">
-//       <div className="text-2xl font-bold text-center bg-gray-500 mb-4 h-12">
-//         DAILY READINGS
-//       </div>
-//       <div className="flex-1 overflow-y-auto overflow-x-hidden p-2">
-//         <Form {...formMethods}>
-//           <form onSubmit={handleSubmit(onSubmit)}>
-//             <div className="grid grid-cols-1 gap-2">
-//               <div className="grid grid-cols-6 font-semibold">
-//                 <div>LABEL NAME</div>
-//                 <div>LAST READING</div>
-//                 <div>CURRENT READING</div>
-//                 <div>DIFFERENCE</div>
-//                 <div>MTD AVERAGE</div>
-//                 <div>LAST MONTH AVERAGE</div>
-//               </div>
-//               {HT_Yard_Array.map((item) => formLoad(item))}
-//               <div className="flex justify-end mt-3">
-//                 <Button
-//                   type="submit"
-//                   className="flex justify-center items-center w-32 mr-4 bg-gray-500"
-//                   disabled={mutation.isPending}
-//                 >
-//                   {mutation.isPending ? 'Submitting...' : 'Submit'}
-//                 </Button>
-//               </div>
-//             </div>
-//           </form>
-//         </Form>
-//       </div>
-//     </div>
-//   );
-// }
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { createDynamicSchema, DynamicFormType } from "@/pages/ZodSchema";
-import { ArrayType, HT_Yard_Array } from "@/lib/ht-yard-array";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { createZodSchema } from "@/pages/ZodSchema";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { useGetFieldsBasedOnLocationIdQuery } from "@/services/query";
 import {
   useDynamicFormInsertStore,
@@ -150,6 +18,8 @@ import {
 import { useEffect, useState } from "react";
 import { DynamicFormInsertAPI } from "@/services/api";
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
+import { toast } from "react-toastify";
 
 export function DynamicFormComp() {
   const selectedLoactionId = useSelectedLocationIdStore(
@@ -158,23 +28,25 @@ export function DynamicFormComp() {
   const { data: FieldsData } = useGetFieldsBasedOnLocationIdQuery({
     LocationId: selectedLoactionId,
   });
-
   const [dailyFieldsArray, setDailyFieldsArray] = useState([]);
+  const [dailyFieldsFlatArray, setDailyFieldsFlatArray] = useState([]);
   const [monthlyFieldsArray, setMonthlyFieldsArray] = useState([]);
-  const dynamicSchema = createDynamicSchema(dailyFieldsArray);
-  const formMethods = useForm<DynamicFormType>({
+  const [MonthlyFieldsFlatArray, setMonthlyFieldsFlatArray] = useState([]);
+  const dynamicSchema = createZodSchema(dailyFieldsFlatArray);
+  type DynamicFormType = z.infer<typeof dynamicSchema>;
+  const dynamicForm = useForm<DynamicFormType>({
     resolver: zodResolver(dynamicSchema),
-    mode: "onChange",
-    reValidateMode: "onChange",
   });
-  const { handleSubmit, control, formState } = formMethods;
-  const { errors } = formState;
 
   const FiledStroe = useDynamicFormInsertStore();
-
+  const flat: any = ({ childFields = [], ...o }) => [
+    o,
+    ...childFields.flatMap(flat),
+  ];
   useEffect(() => {
     if (FieldsData?.dailyFields?.length > 0) {
       setDailyFieldsArray(FieldsData.dailyFields);
+      setDailyFieldsFlatArray(FieldsData.dailyFields.flatMap(flat));
     }
     if (FieldsData?.monthlyFields?.length > 0) {
       setMonthlyFieldsArray(FieldsData.monthlyFields);
@@ -182,6 +54,13 @@ export function DynamicFormComp() {
   }, [FieldsData]);
   const onSubmit = (data: DynamicFormType) => {
     console.log(data, "form Data");
+    let input = {
+      fields: FiledStroe.Fields,
+      locationId: selectedLoactionId,
+      empId: "NPI3838",
+      remark: "Test",
+    };
+    DynamicForm(input);
   };
 
   const { mutate: DynamicForm } = useMutation({
@@ -194,25 +73,24 @@ export function DynamicFormComp() {
     },
   });
 
-  const formdata = formMethods.watch();
-console.log(formdata,"formdata")
-  // type onValueChangeType={
-
-  // }
   const onValueChange = async (
     event: any,
     feildId: number,
-    subFieldId: number
+    subFieldId: number,
+    reset: boolean,
+    difference: number
   ) => {
     let filed = {
       value: event.target.value,
       fieldId: feildId,
       subFieldId: subFieldId,
+      reset: false,
+      difference: 10,
     };
     let data: any[];
     if (FiledStroe.Fields.length > 0) {
       data = [
-        ...(feildId !== 0
+        ...(subFieldId === 0
           ? FiledStroe.Fields.filter((item: any) => item.fieldId !== feildId)
           : FiledStroe.Fields.filter(
               (item: any) => item.subFieldId !== subFieldId
@@ -225,55 +103,61 @@ console.log(formdata,"formdata")
     }
   };
 
-  const formLoad = (data: any, parentPath = "", ischild = false) => {
-    const currentPath = parentPath ? `${parentPath}.${data.name}` : data.name;
+  const formLoad = (
+    fieldData: any,
+    parentPath = "",
+    ischild = false,
+    filedId: number
+  ) => {
+    const currentPath = parentPath
+      ? `${parentPath}.${fieldData.name}`
+      : fieldData.name;
     return (
-      <div className="grid grid-cols-1 gap-2" key={data.name}>
-        {data.childFields && data.childFields.length > 0 ? (
+      <div className="grid grid-cols-1 gap-2" key={fieldData.name}>
+        {fieldData.childFields && fieldData.childFields.length > 0 ? (
           <div className="col-span-3 grid grid-cols-1 items-start">
             <div className="grid grid-cols-6 gap-2">
               <label className="w-full h-full flex items-center justify-start text-white">
-                {data.name}
+                {fieldData.name}
               </label>
             </div>
             <div className="col-span-1 grid grid-cols-1 gap-2">
-              {data.childFields.map((C_Item: any) =>
-                formLoad(C_Item, currentPath, true)
+              {fieldData.childFields.map((C_Item: any) =>
+                formLoad(C_Item, currentPath, true, fieldData.id)
               )}
             </div>
           </div>
         ) : (
           <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
             <label className="w-full h-full flex items-center justify-start text-white">
-              {data.name}
+              {fieldData.name}
             </label>
             <div>
               <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
-                {data.previousReading !== "" ? data.previousReading : "0"}
+                {fieldData.previousReading !== ""
+                  ? fieldData.previousReading
+                  : "0"}
               </div>
             </div>
             <div className="w-full">
               <FormField
-                control={control}
-                name={`${currentPath}_1`}
+                control={dynamicForm.control}
+                name={fieldData.name}
                 render={({ field }) => (
-                  <FormItem className="max-h-[65px]">
-                    <Input
-                      {...field}
-                      value={field.value ?? ""}
-                      className="w-full p-2"
-                      onBlur={(e) =>
-                        onValueChange(
-                          e,
-                          !ischild ? data.id : 0,
-                          ischild ? data.id : 0
-                        )
-                      }
-                    />
-                    <FormMessage>
-                      {errors[`${currentPath}_1`] &&
-                        errors[`${currentPath}_1`].message}
-                    </FormMessage>
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        onBlur={(e) =>
+                          onValueChange(
+                            e,
+                            !ischild ? fieldData.id : filedId,
+                            ischild ? fieldData.id : 0
+                          )
+                        }
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -287,13 +171,13 @@ console.log(formdata,"formdata")
 
             <div>
               <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
-                {data.mtdAvg}
+                {fieldData.mtdAvg}
               </div>
             </div>
 
             <div>
               <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
-                {data.previousMonthAvg}
+                {fieldData.previousMonthAvg}
               </div>
             </div>
           </div>
@@ -308,8 +192,8 @@ console.log(formdata,"formdata")
         DAILY READINGS
       </div>
       <div className="flex-1 overflow-y-auto overflow-x-hidden bg-indigo-950">
-        <Form {...formMethods}>
-          <form onSubmit={formMethods.handleSubmit(onSubmit)}>
+        <Form {...dynamicForm}>
+          <form onSubmit={dynamicForm.handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 gap-2">
               <div className="sticky top-0 z-10 grid grid-cols-6 font-semibold bg-yellow-400 text-black">
                 <div className="p-2">LABEL NAME</div>
