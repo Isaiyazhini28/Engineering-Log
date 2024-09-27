@@ -35,7 +35,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { HT_Yard_Array } from "@/lib/ht-yard-array";
+import { Textarea } from "@/components/ui/textarea";
 
 // Define the type
 export type ArrayType = {
@@ -51,7 +62,6 @@ export type ArrayType = {
 
 // Sample data with status included
 const data = HT_Yard_Array.flatMap((field) => {
-  // Flatten child fields if they exist
   if (field.child) {
     return field.child.map((child) => ({
       id: child.fieldId,
@@ -77,15 +87,7 @@ const data = HT_Yard_Array.flatMap((field) => {
 export const columns: ColumnDef<any>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || table.getIsSomePageRowsSelected()
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+    header: () => <div />,
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -98,7 +100,6 @@ export const columns: ColumnDef<any>[] = [
     enableHiding: false,
   },
   ...HT_Yard_Array.flatMap((field) => {
-    // Flatten child fields if they exist
     if (field.child) {
       return field.child.map((child) => ({
         accessorKey: child.name.toLowerCase().replace(/ /g, "_"),
@@ -157,7 +158,7 @@ export function ApprovalTable() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [remark, setRemark] = React.useState<string>("");
+  const [actionType, setActionType] = React.useState<string | null>(null); // Track action type
 
   const table = useReactTable({
     data,
@@ -179,18 +180,13 @@ export function ApprovalTable() {
   });
 
   const handleApprove = () => {
-    // Implement approval logic here
+    setActionType("Approve");
     console.log("Approved rows:", rowSelection);
   };
 
   const handleReject = () => {
-    // Implement rejection logic here
+    setActionType("Reject");
     console.log("Rejected rows:", rowSelection);
-  };
-
-  const handleSubmitRemark = () => {
-    // Implement remark submission logic here
-    console.log("Submitted remark:", remark);
   };
 
   return (
@@ -199,9 +195,7 @@ export function ApprovalTable() {
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter fields..."
-            value={
-              (table.getColumn("name")?.getFilterValue() as string) ?? ""
-            }
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("name")?.setFilterValue(event.target.value)
             }
@@ -236,7 +230,7 @@ export function ApprovalTable() {
           </DropdownMenu>
         </div>
         <div className="flex-1 overflow-auto">
-          <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
+          <div className="min-w-full min-h-full overflow-auto bg-indigo-950">
             <Table>
               <TableHeader className="bg-yellow-400 text-black">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -286,44 +280,48 @@ export function ApprovalTable() {
             </Table>
           </div>
         </div>
+
         <div className="flex items-center justify-between py-4 border-t">
           <div className="flex justify-end w-full gap-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleApprove}
-              disabled={Object.keys(rowSelection).length === 0}
-              className="bg-green-600 text-white border-green-400 hover:bg-green-400"
-            >
-              Approve
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleReject}
-              disabled={Object.keys(rowSelection).length === 0}
-              className="bg-red-500 text-white border-red-400 hover:bg-red-400 "
-            >
-              Reject
-            </Button>
-          </div>
-        </div>
-        <label className="font-semibold">Add a Comment</label>
-        <div className="py-4 border-t">
-          <textarea
-            value={remark}
-            onChange={(e) => setRemark(e.target.value)}
-            placeholder="Enter your remarks here..."
-            className="w-full h-25 p-2 border rounded-md "
-          />
-          <div className="flex justify-end w-full">
-            <Button
-              variant="outline"
-              className="mt-2 bg-green-600 text-white border-green-400 hover:bg-green-400"
-              onClick={handleSubmitRemark}
-            >
-              Submit
-            </Button>
+            <Dialog open={!!actionType} onOpenChange={setActionType}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleApprove}
+                disabled={Object.keys(rowSelection).length === 0}
+                className="bg-green-600 text-white border-green-400 hover:bg-green-400"
+              >
+                Approve
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleReject}
+                disabled={Object.keys(rowSelection).length === 0}
+                className="bg-red-600 text-white border-red-400 hover:bg-red-400"
+              >
+                Reject
+              </Button>
+
+              <DialogContent className="bg-white text-black">
+                <DialogHeader>
+                  <DialogTitle>{actionType}Remarks</DialogTitle>
+                  <DialogDescription>
+                 
+                  </DialogDescription>
+                </DialogHeader>
+                <Textarea className="bg-white text-black placeholder:Enter your Remarks" />
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    className="bg-green-600 text-white hover:bg-green-300"
+                    onClick={() => setActionType(null)} // Close the dialog
+                  >
+                    Submit
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
