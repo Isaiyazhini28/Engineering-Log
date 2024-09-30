@@ -8,7 +8,7 @@ using EngineeringLog.Services.IServices;
 
 namespace EngineeringLog.Services.Service
 {
-    public class MasterService : IClientUrlServices
+    public class MasterService : IMasterServices
     {
         private readonly HttpClient _httpClient;
         public MasterService(HttpClient httpClient)

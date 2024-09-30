@@ -48,13 +48,6 @@ namespace EngineeringLog.Controllers
                 }
             });
         }
-
-        [HttpGet("secure-data")]
-        public IActionResult SecureData()
-        {
-            return Ok("This is secure data accessible only with valid JWT.");
-        }
-
         private string GenerateJwtToken(string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

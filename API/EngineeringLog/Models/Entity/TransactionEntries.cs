@@ -10,6 +10,7 @@ namespace EngineeringLog.Models.Entity
         public string RefId { get; set; }
         [ForeignKey("LocationMaster")]
         public int LocationId { get; set; }
+        public LocationMaster Location { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public string? RevisedBy { get; set; }

@@ -15,6 +15,7 @@ namespace EngineeringLog.Models.Entity
         public FieldMaster Field { get; set; }
         [ForeignKey("SubFieldMaster")]
         public int? SubFieldId { get; set; }
+        public SubFieldMaster SubField { get; set; }    
         public string Value { get; set; }
         public bool Reset { get; set; } = false;
         public float Difference { get; set; }
