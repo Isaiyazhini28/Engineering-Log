@@ -283,12 +283,14 @@ export function DynamicGridTable() {
                       !startDate && "text-muted-foreground"
                     )}
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarIcon className="mr-2 h-4 w-4 text-white" />
+                    <div className="text-white">
                     {startDate ? (
                       format(startDate, "PPP")
                     ) : (
                       <span>Start Date</span>
                     )}
+                    </div>
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 bg-gray-400 text-white">
@@ -311,12 +313,14 @@ export function DynamicGridTable() {
                           !endDate && "text-muted-foreground"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <CalendarIcon className="mr-2 h-4 w-4 text-white" />
+                        <div className="text-white">
                         {endDate ? (
                           format(endDate, "PPP")
                         ) : (
                           <span>End Date</span>
                         )}
+                        </div>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-gray-400 text-white">
@@ -386,7 +390,7 @@ export function DynamicGridTable() {
           </div>
         </div>
 
-        <Pagination>
+        <Pagination className="flex justify-end">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious href="#" />

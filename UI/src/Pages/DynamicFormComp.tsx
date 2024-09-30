@@ -20,6 +20,7 @@ import { DynamicFormInsertAPI } from "@/services/api";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { toast } from "react-toastify";
+import { Textarea } from "@/components/ui/textarea"
 
 export function DynamicFormComp() {
   const selectedLoactionId = useSelectedLocationIdStore(
@@ -43,6 +44,7 @@ export function DynamicFormComp() {
     o,
     ...childFields.flatMap(flat),
   ];
+
   useEffect(() => {
     if (FieldsData?.dailyFields?.length > 0) {
       setDailyFieldsArray(FieldsData.dailyFields);
@@ -52,6 +54,7 @@ export function DynamicFormComp() {
       setMonthlyFieldsArray(FieldsData.monthlyFields);
     }
   }, [FieldsData]);
+
   const onSubmit = (data: DynamicFormType) => {
     console.log(data, "form Data");
     let input = {
@@ -59,6 +62,7 @@ export function DynamicFormComp() {
       locationId: selectedLoactionId,
       empId: "NPI3838",
       remark: "Test",
+      
     };
     DynamicForm(input);
   };
@@ -73,21 +77,25 @@ export function DynamicFormComp() {
     },
   });
 
-  const onValueChange = async (
+  const onValueChange = async(
     event: any,
     feildId: number,
     subFieldId: number,
-    reset: boolean,
-    difference: number
+    previousReading: number
   ) => {
+    const currentReading = parseFloat(event.target.value) || 0;
+
+    const difference = currentReading - previousReading;
+
     let filed = {
-      value: event.target.value,
+      value: currentReading.toString(),
       fieldId: feildId,
       subFieldId: subFieldId,
       reset: false,
-      difference: 10,
+      difference: difference, // Save calculated difference
     };
     let data: any[];
+
     if (FiledStroe.Fields.length > 0) {
       data = [
         ...(subFieldId === 0
@@ -151,7 +159,8 @@ export function DynamicFormComp() {
                           onValueChange(
                             e,
                             !ischild ? fieldData.id : filedId,
-                            ischild ? fieldData.id : 0
+                            ischild ? fieldData.id : 0,
+                            fieldData.previousReading // Pass previous reading here
                           )
                         }
                         onChange={field.onChange}
@@ -165,7 +174,7 @@ export function DynamicFormComp() {
 
             <div>
               <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
-                Difference
+               {FiledStroe.Fields.find((item: any) => ischild?item.subFieldId === fieldData.id:item.fieldId === fieldData.id)?.difference || 0}
               </div>
             </div>
 
@@ -183,11 +192,12 @@ export function DynamicFormComp() {
           </div>
         )}
       </div>
+      
     );
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full w-full  bg-slate-300">
+    <div className="flex-1 flex flex-col h-full w-full bg-slate-300">
       <div className="text-2xl font-bold text-center bg-yellow-100 h-12">
         DAILY READINGS
       </div>
@@ -205,10 +215,16 @@ export function DynamicFormComp() {
               </div>
               {dailyFieldsArray?.map((item) => formLoad(item))}
               {monthlyFieldsArray?.map((item) => formLoad(item))}
+              <Textarea
+              className="pr-8 ml-3 mt-3  bg-slate-100 w-full"
+              placeholder="Add a comment..."
+              >
+                
+              </Textarea>
               <div className="flex justify-end mt-3">
                 <Button
                   type="submit"
-                  className="flex justify-center items-center w-32 mr-4 bg-yellow-300 text-black"
+                  className="flex justify-center items-center w-32 mr-4 bg-yellow-300 text-black hover:bg-yellow-100"
                 >
                   Submit
                 </Button>
