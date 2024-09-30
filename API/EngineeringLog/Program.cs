@@ -8,22 +8,17 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// 1. Setup connection to the database
 builder.Services.AddDbContext<ApiContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("EngineeringLog")));
 
-// 2. Add services to the container
-builder.Services.AddScoped<IService, LogService>();
-builder.Services.AddHttpClient<IClientUrlServices, MasterService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IFormService, FormService>();
+builder.Services.AddHttpClient<IMasterServices, MasterService>();
 builder.Services.AddScoped<IHrmsAuthService, HrmsAuthService>();
 builder.Services.AddHttpClient<IHrmsAuthService, HrmsAuthService>();
 
-
-// 3. Add controllers
 builder.Services.AddControllers();
 
-// 4. Enable Swagger with JWT authentication support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -53,7 +48,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// 5. Configure CORS policy
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cp", policy =>
@@ -64,7 +59,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 6. Configure JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -77,21 +71,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero // Optional: reduce clock skew
+            ClockSkew = TimeSpan.Zero 
         };
     });
 
-// 7. Build the app
+
 var app = builder.Build();
 
-// Enable Swagger in Development
+
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// 8. Middleware setup
+
 app.UseHttpsRedirection();
 app.UseCors("cp");
 

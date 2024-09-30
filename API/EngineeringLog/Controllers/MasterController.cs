@@ -11,9 +11,9 @@ namespace EngineeringLog.Controllers
     [Authorize]
     public class MasterController : ControllerBase
     {
-        private readonly IClientUrlServices urlService;
+        private readonly IMasterServices urlService;
 
-        public MasterController(IClientUrlServices ClientUrlService)
+        public MasterController(IMasterServices ClientUrlService)
         {
             urlService = ClientUrlService;
 

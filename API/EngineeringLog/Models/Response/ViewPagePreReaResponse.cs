@@ -1,9 +1,9 @@
 ﻿namespace EngineeringLog.Models.Response
 {
-    public class TransactionEntryResponse
+    public class ViewPagePreReaResponse
     {
         public int FieldId { get; set; }
         public int? SubFieldId { get; set; }
-        public string Value { get; set; }
+        public string LastReading { get; set; }
     }
 }
