@@ -37,6 +37,7 @@ export function DynamicFormComp() {
   type DynamicFormType = z.infer<typeof dynamicSchema>;
   const dynamicForm = useForm<DynamicFormType>({
     resolver: zodResolver(dynamicSchema),
+    mode:"onChange"
   });
 
   const FiledStroe = useDynamicFormInsertStore();
