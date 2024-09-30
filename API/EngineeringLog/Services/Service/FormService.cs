@@ -21,25 +21,23 @@ namespace EngineeringLog.Services.Service
             int transactionCount = _dbContext.TransactionEntries
                 .Where(t => t.LocationId == locationId && t.CreatedDate.Date == DateTime.UtcNow.Date)
                 .Count();
-
             string serialNumber = (transactionCount + 1).ToString("D4");
             return $"{currentDate}-{locationId}-{serialNumber}";
         }
 
-
-        public async Task<int> CreateTransactionAsync(CreateTransactionRequest request)
+        public async Task<int> CreateTransaction(CreateTransactionRequest request)
         {
             var existingTransaction = await _dbContext.TransactionEntries
                                     .Where(te => te.LocationId == request.LocationId
                                               && te.CreatedDate.Date == DateTime.UtcNow.Date
                                               && te.ApprovalStatus == ApprovalStatus.Open)
                                     .FirstOrDefaultAsync();
-
             if (existingTransaction != null)
             {
                  
                 return existingTransaction.Id;
             }
+
             var transactionEntry = new TransactionEntries
             {
                 RefId = GenerateReferenceId(request.LocationId),
@@ -52,10 +50,20 @@ namespace EngineeringLog.Services.Service
             _dbContext.TransactionEntries.Add(transactionEntry);
             await _dbContext.SaveChangesAsync();
 
+            var activityLog = new ActivityLog
+            {
+                TransactionId = transactionEntry.Id,
+                Action = $"Created Transaction in {transactionEntry.Location.Name}" ,
+                CreatedBy = request.EmployeeId,
+                CreatedAt = DateTime.UtcNow
+            };
+            _dbContext.ActivityLogs.Add(activityLog);
+            await _dbContext.SaveChangesAsync();
+
             var fieldMasters = await _dbContext.FieldMasters
-                .Include(f => f.SubFields)
-                .Where(f => f.LocationId == request.LocationId)
-                .ToListAsync();
+                                .Include(f => f.SubFields)
+                                .Where(f => f.LocationId == request.LocationId)
+                                .ToListAsync();
 
             var transactionValues = fieldMasters.SelectMany(field =>
                 field.HasChild && field.SubFields != null && field.SubFields.Any()
@@ -87,18 +95,17 @@ namespace EngineeringLog.Services.Service
             );
             await _dbContext.TransactionValues.AddRangeAsync(transactionValues);
             await _dbContext.SaveChangesAsync();
-
-
             return transactionEntry.Id;
         }
-        public async Task<List<TransactionValueResponse>> GetOpenTransactionValuesAsync(int locationId)
+
+        public async Task<TransactionValueResponse> GetOpenTransactionValues(int locationId)
         {
             var transactionValues = await _dbContext.TransactionValues
                 .Include(tv => tv.Field) 
                 .Include(tv => tv.SubField) 
                 .Where(tv => tv.Transaction.LocationId == locationId && tv.Transaction.CreatedDate >= DateTime.UtcNow.Date && tv.Transaction.CreatedDate < DateTime.UtcNow.Date.AddDays(1)
                           && tv.Transaction.ApprovalStatus == ApprovalStatus.Open)
-                .Select(tv => new TransactionValueResponse
+                .Select(tv => new TransactionFieldValueResponse
                 {
                     TransactionValueId = tv.Id,
                     FieldId = tv.Field.Id,
@@ -106,14 +113,21 @@ namespace EngineeringLog.Services.Service
                     SubFieldId = tv.SubField.Id,
                     SubFieldName = tv.SubField != null ? tv.SubField.Name : null,
                     Value = tv.Value,
-                    Difference = tv.Difference
+                    Difference = tv.Difference,
+                    Frequency = tv.Field.Frequency
                 })
                 .ToListAsync();
 
-            return transactionValues;
+            var groupedTransactionValues = new TransactionValueResponse
+            {
+                DailyFields = transactionValues.Where(tv => tv.Frequency == FrequencyType.Daily).ToList(),
+                MonthlyFields = transactionValues.Where(tv => tv.Frequency == FrequencyType.Monthly).ToList()
+            };
+
+            return groupedTransactionValues;
         }
 
-        public async Task<int> UpdateTransactionValueAsync(UpdateTransactionValueRequest request)
+        public async Task<int> UpdateTransactionValue(UpdateTransactionValueRequest request)
         {
             var transactionValue = await _dbContext.TransactionValues
                 .Include(tv => tv.Transaction) 
@@ -124,31 +138,21 @@ namespace EngineeringLog.Services.Service
             transactionValue.Reset= request.Reset;
 
             var previousEntry = await _dbContext.TransactionValues
-    .Include(tv => tv.Transaction) 
-    .Where(tv => tv.FieldId == transactionValue.FieldId &&
-                 tv.Transaction != null &&
-                 tv.Transaction.CreatedDate < transactionValue.Transaction.CreatedDate)
-    .OrderByDescending(tv => tv.Transaction.CreatedDate)
-    .FirstOrDefaultAsync();
-
-           
-            if (previousEntry == null)
-            {
-                Console.WriteLine("No previous entry found for the current transaction value.");
-            }
-
+                                .Include(tv => tv.Transaction) 
+                                .Where(tv => tv.FieldId == transactionValue.FieldId &&
+                                             tv.Transaction != null &&
+                                             tv.Transaction.CreatedDate < transactionValue.Transaction.CreatedDate)
+                                .OrderByDescending(tv => tv.Transaction.CreatedDate)
+                                .FirstOrDefaultAsync();
             float perHourAvg;
             float perMinAvg;
-
             if (previousEntry == null || previousEntry.Transaction == null)
-            {
-                // No previous entry found; use default values
-                perHourAvg = transactionValue.Difference / 24; // Default per hour average
-                perMinAvg = perHourAvg / 60; // Default per minute average
+            { 
+                perHourAvg = transactionValue.Difference / 24; 
+                perMinAvg = perHourAvg / 60;
             }
             else
             {
-                // Calculate the time difference in hours
                 var timeDifference = (transactionValue.Transaction.CreatedDate - previousEntry.Transaction.CreatedDate).TotalHours;
 
                 if (timeDifference > 0)
@@ -170,7 +174,8 @@ namespace EngineeringLog.Services.Service
 
             return request.TransactionValueId;
         }
-        public async Task<string> UpdateTransactionStatusAsync(UpdateTransactionStatusRequest request)
+
+        public async Task<string> UpdateTransactionStatus(UpdateTransactionStatusRequest request)
         {
             var transactionEntry = await _dbContext.TransactionEntries
                 .Include(te => te.Location)
@@ -182,95 +187,20 @@ namespace EngineeringLog.Services.Service
                 transactionEntry.Remarks = request.Remark;
             }
             await _dbContext.SaveChangesAsync();
+            var activityLog = new ActivityLog
+            {
+                TransactionId = transactionEntry.Id,
+                Action = $"Updated {transactionEntry.Location.Name}",
+                CreatedBy = request.EmployeeId.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                ModifiedBy = request.EmployeeId.ToString(),
+                ModifiedAt = DateTime.UtcNow
+            };
+            _dbContext.ActivityLogs.Add(activityLog);
+            await _dbContext.SaveChangesAsync();
             string response= transactionEntry.Location.Name;
 
             return response; 
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public async Task<string> CreateTransaction(TransactionRequest request)
-        {
-            string refId = GenerateReferenceId(request.LocationId);
-            var transactionEntry = new TransactionEntries
-            {
-                RefId = refId,
-                LocationId = request.LocationId,
-                CreatedBy = request.EmpId,
-                Remarks=request.Remark,
-                CreatedDate = DateTime.UtcNow,
-                ApprovalStatus = ApprovalStatus.Pending,
-                RevisedBy = request.EmpId,
-            };
-            _dbContext.TransactionEntries.Add(transactionEntry);
-            _dbContext.SaveChanges();
-            var previousEntryDate = await _dbContext.TransactionEntries
-                                   .Where(te => te.LocationId == request.LocationId)
-                                   .OrderByDescending(te => te.CreatedDate)
-                                   .FirstOrDefaultAsync();
-            List<TransactionValues> transactionValues = request.Fields.Select(field =>
-            {
-                float perHourAvg = 0;
-                float perMinAvg = 0;
-                if (previousEntryDate == null)
-                {
-                    perHourAvg = field.Difference / 24;
-                    perMinAvg = perHourAvg / 60;
-                }
-                else
-                {
-                    var timeDifference = (transactionEntry.CreatedDate - previousEntryDate.CreatedDate).TotalHours;
-                    perHourAvg = timeDifference > 0 ? field.Difference / (float)timeDifference : 0;
-                    perMinAvg = perHourAvg / 60;
-
-                }
-                return new TransactionValues
-                {
-                    TransactionId = transactionEntry.Id,
-                    FieldId = field.FieldId,
-                    SubFieldId = field.SubFieldId,
-                    Value = field.Value,
-                    Reset = field.Reset,
-                    Difference = field.Difference,
-                    PerHourAvg = perHourAvg,
-                    PerMinAvg = perMinAvg,
-                };
-            }).ToList();
-            _dbContext.TransactionValues.AddRange(transactionValues);
-           /*ActivityLog activityLog = new 
-            {
-                TransactionId = transactionEntry.Id,
-                Action = $"Readings entered in Location ID:{transactionEntry.Location.Name}",
-                CreatedBy = request.EmpId,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedBy = request.EmpId,
-                ModifiedAt = DateTime.UtcNow
-            };
-            _dbContext.ActivityLogs.Add(activityLog);*/
-            await _dbContext.SaveChangesAsync();
-            _dbContext.ChangeTracker.Clear();
-           
-            return $" submitted successfully.";
         }
 
         public async Task<ViewPageResponse> GetViewPage(int locationId)
@@ -432,7 +362,7 @@ namespace EngineeringLog.Services.Service
         {
             var currentDate = DateTime.UtcNow;
             var firstDayOfCurrentMonth = new DateTime(currentDate.Year, currentDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-            var lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1); // Last day of the previous month
+            var lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1); 
             var firstDayOfPreviousMonth = new DateTime(lastDayOfPreviousMonth.Year, lastDayOfPreviousMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
             var previousMonthAvgData = await (from te in _dbContext.TransactionEntries
@@ -468,99 +398,6 @@ namespace EngineeringLog.Services.Service
 
             return transactionLogs; 
         }
-        /* public async Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request)
-       {
-           var transactionEntry = await _dbContext.TransactionEntries
-               .FirstOrDefaultAsync(te => te.RefId == request.RefId || te.Id == request.TransactionId);
-
-           if (transactionEntry == null)
-           {
-               throw new Exception("Transaction not found");
-           }
-           transactionEntry.RevisedBy = request.EmpId;
-           transactionEntry.Remarks = request.Remarks;
-           transactionEntry.ApprovalStatus = ApprovalStatus.Pending;
-           _dbContext.TransactionEntries.Update(transactionEntry);
-           await _dbContext.SaveChangesAsync();
-           var previousEntries = await _dbContext.TransactionValues
-               .Where(tv => tv.TransactionId == transactionEntry.Id &&
-                            request.Fields.Select(f => f.FieldId).Contains(tv.FieldId))
-               .ToListAsync();
-           var updatedTransactionValues = request.Fields.Select(field =>
-           {
-               var previousEntry = previousEntries
-                   .FirstOrDefault(tv => tv.FieldId == field.FieldId);
-               float perHourAvg = 0;
-               float perMinAvg = 0;
-               if (previousEntry != null)
-               {
-                   var timeDifferenceInHours = (transactionEntry.CreatedDate - previousEntry.Transaction.CreatedDate).TotalHours;
-                   perHourAvg = field.Difference / (float)timeDifferenceInHours;
-                   perMinAvg = perHourAvg / 60;
-               }
-               else
-               {
-                   perHourAvg = field.Difference / 24;
-                   perMinAvg = perHourAvg / 60;
-               }
-
-
-               if (previousEntry != null)
-               {
-                   previousEntry.Value = field.Value;
-                   previousEntry.Reset = field.Reset;
-                   previousEntry.Difference = field.Difference;
-                   previousEntry.PerHourAvg = perHourAvg;
-                   previousEntry.PerMinAvg = perMinAvg;
-
-                   return previousEntry;
-               }
-               else
-               {
-                   return new TransactionValues
-                   {
-                       TransactionId = transactionEntry.Id,
-                       FieldId = field.FieldId,
-                       SubFieldId = field.SubFieldId,
-                       Value = field.Value,
-                       Reset = field.Reset,
-                       Difference = field.Difference,
-                       PerHourAvg = perHourAvg,
-                       PerMinAvg = perMinAvg,
-                   };
-               }
-           }).ToList();
-
-           _dbContext.TransactionValues.UpdateRange(updatedTransactionValues);
-
-
-           var activityLog = new ActivityLog
-           {
-               TransactionId = transactionEntry.Id,
-               Action = "Transaction Updated",
-               ModifiedBy = request.EmpId,
-               ModifiedAt = DateTime.UtcNow
-           };
-
-           _dbContext.ActivityLogs.Add(activityLog);
-           await _dbContext.SaveChangesAsync();
-
-           _dbContext.ChangeTracker.Clear();
-
-           var response = updatedTransactionValues.Select(tv => new TransactionEntryResponse
-           {
-               FieldId = tv.FieldId,
-               SubFieldId = tv.SubFieldId,
-               Value = tv.Value,
-           }).ToList();
-
-           return response;
-       }
-        */
-
-
-
-
 
         public async Task<ApproverResponse> ApproveTransaction(int transactionId, ApproverRequest request)
             {
@@ -578,9 +415,8 @@ namespace EngineeringLog.Services.Service
             transactionEntry.Remarks = request.Remark;
             transactionEntry.ActionBy = request.EmpId;
             transactionEntry.ActionAt = DateTime.UtcNow;
-            // Update the transaction in the database
             _dbContext.TransactionEntries.Update(transactionEntry);
-            // Log the action in the ActivityLog table
+
             var activityLog = new ActivityLog
             {
                 TransactionId = transactionEntry.Id,
@@ -598,6 +434,7 @@ namespace EngineeringLog.Services.Service
                 Message = "Approved-" + transactionEntry.RefId,
             };
         }
+
         public async Task<ApproverResponse> RejectTransaction(int transactionId, ApproverRequest request)
         {
             var transactionEntry = await _dbContext.TransactionEntries
@@ -675,3 +512,155 @@ namespace EngineeringLog.Services.Service
 
     }
 }
+/* public async Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request)
+      {
+          var transactionEntry = await _dbContext.TransactionEntries
+              .FirstOrDefaultAsync(te => te.RefId == request.RefId || te.Id == request.TransactionId);
+
+          if (transactionEntry == null)
+          {
+              throw new Exception("Transaction not found");
+          }
+          transactionEntry.RevisedBy = request.EmpId;
+          transactionEntry.Remarks = request.Remarks;
+          transactionEntry.ApprovalStatus = ApprovalStatus.Pending;
+          _dbContext.TransactionEntries.Update(transactionEntry);
+          await _dbContext.SaveChangesAsync();
+          var previousEntries = await _dbContext.TransactionValues
+              .Where(tv => tv.TransactionId == transactionEntry.Id &&
+                           request.Fields.Select(f => f.FieldId).Contains(tv.FieldId))
+              .ToListAsync();
+          var updatedTransactionValues = request.Fields.Select(field =>
+          {
+              var previousEntry = previousEntries
+                  .FirstOrDefault(tv => tv.FieldId == field.FieldId);
+              float perHourAvg = 0;
+              float perMinAvg = 0;
+              if (previousEntry != null)
+              {
+                  var timeDifferenceInHours = (transactionEntry.CreatedDate - previousEntry.Transaction.CreatedDate).TotalHours;
+                  perHourAvg = field.Difference / (float)timeDifferenceInHours;
+                  perMinAvg = perHourAvg / 60;
+              }
+              else
+              {
+                  perHourAvg = field.Difference / 24;
+                  perMinAvg = perHourAvg / 60;
+              }
+
+
+              if (previousEntry != null)
+              {
+                  previousEntry.Value = field.Value;
+                  previousEntry.Reset = field.Reset;
+                  previousEntry.Difference = field.Difference;
+                  previousEntry.PerHourAvg = perHourAvg;
+                  previousEntry.PerMinAvg = perMinAvg;
+
+                  return previousEntry;
+              }
+              else
+              {
+                  return new TransactionValues
+                  {
+                      TransactionId = transactionEntry.Id,
+                      FieldId = field.FieldId,
+                      SubFieldId = field.SubFieldId,
+                      Value = field.Value,
+                      Reset = field.Reset,
+                      Difference = field.Difference,
+                      PerHourAvg = perHourAvg,
+                      PerMinAvg = perMinAvg,
+                  };
+              }
+          }).ToList();
+
+          _dbContext.TransactionValues.UpdateRange(updatedTransactionValues);
+
+
+          var activityLog = new ActivityLog
+          {
+              TransactionId = transactionEntry.Id,
+              Action = "Transaction Updated",
+              ModifiedBy = request.EmpId,
+              ModifiedAt = DateTime.UtcNow
+          };
+
+          _dbContext.ActivityLogs.Add(activityLog);
+          await _dbContext.SaveChangesAsync();
+
+          _dbContext.ChangeTracker.Clear();
+
+          var response = updatedTransactionValues.Select(tv => new TransactionEntryResponse
+          {
+              FieldId = tv.FieldId,
+              SubFieldId = tv.SubFieldId,
+              Value = tv.Value,
+          }).ToList();
+
+          return response;
+      }
+       */
+/* public async Task<string> CreateTransaction(TransactionRequest request)
+        {
+            string refId = GenerateReferenceId(request.LocationId);
+            var transactionEntry = new TransactionEntries
+            {
+                RefId = refId,
+                LocationId = request.LocationId,
+                CreatedBy = request.EmpId,
+                Remarks=request.Remark,
+                CreatedDate = DateTime.UtcNow,
+                ApprovalStatus = ApprovalStatus.Pending,
+                RevisedBy = request.EmpId,
+            };
+            _dbContext.TransactionEntries.Add(transactionEntry);
+            _dbContext.SaveChanges();
+            var previousEntryDate = await _dbContext.TransactionEntries
+                                   .Where(te => te.LocationId == request.LocationId)
+                                   .OrderByDescending(te => te.CreatedDate)
+                                   .FirstOrDefaultAsync();
+            List<TransactionValues> transactionValues = request.Fields.Select(field =>
+            {
+                float perHourAvg = 0;
+                float perMinAvg = 0;
+                if (previousEntryDate == null)
+                {
+                    perHourAvg = field.Difference / 24;
+                    perMinAvg = perHourAvg / 60;
+                }
+                else
+                {
+                    var timeDifference = (transactionEntry.CreatedDate - previousEntryDate.CreatedDate).TotalHours;
+                    perHourAvg = timeDifference > 0 ? field.Difference / (float)timeDifference : 0;
+                    perMinAvg = perHourAvg / 60;
+
+                }
+                return new TransactionValues
+                {
+                    TransactionId = transactionEntry.Id,
+                    FieldId = field.FieldId,
+                    SubFieldId = field.SubFieldId,
+                    Value = field.Value,
+                    Reset = field.Reset,
+                    Difference = field.Difference,
+                    PerHourAvg = perHourAvg,
+                    PerMinAvg = perMinAvg,
+                };
+            }).ToList();
+            _dbContext.TransactionValues.AddRange(transactionValues);
+           /*ActivityLog activityLog = new 
+            {
+                TransactionId = transactionEntry.Id,
+                Action = $"Readings entered in Location ID:{transactionEntry.Location.Name}",
+                CreatedBy = request.EmpId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedBy = request.EmpId,
+                ModifiedAt = DateTime.UtcNow
+            };
+            _dbContext.ActivityLogs.Add(activityLog);
+await _dbContext.SaveChangesAsync();
+_dbContext.ChangeTracker.Clear();
+
+return $" submitted successfully.";
+        }*/
