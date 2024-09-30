@@ -86,7 +86,8 @@ export interface HtYardInterface {
 interface DynamicFormInsertInterface {
   value:number,
   fieldId:number,
-  subFieldId:number
+  subFieldId:number,
+  difference:number,
 }
 
   type selectedDynamicFormInsertType={
@@ -109,35 +110,5 @@ interface DynamicFormInsertInterface {
       }
     )
   );
-  // export interface FieldsInterface{
-  //   id:number,
-  //   name:string,
-  //   sequenceId:number,
-  //   frequency:number,
-  //   type:string,
-  //   hasChild:boolean,
-  //   childFields:FieldsInterface[]
-  // }
-
-  // type FieldsStoreType = {
-  //   Fields: FieldsInterface[];
-  //   setFields: (data: FieldsInterface[]) => void;
-  // };
   
-  // export const useFieldsStore = create<FieldsStoreType>()(
-  //   persist(
-  //     (set) => ({
-  //       Fields: [],
-  //       setFields: (data: FieldsInterface[]) => {
-  //         set(() => ({ Fields: data }));
-  //       },
-  //     }),
-  //     {
-  //       name: "Selected Fields",
-  //       storage: createJSONStorage(() => sessionStorage),
-  //     }
-  //   )
-  // );
-
   
- 

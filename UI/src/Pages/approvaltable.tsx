@@ -230,7 +230,7 @@ export function ApprovalTable() {
           </DropdownMenu>
         </div>
         <div className="flex-1 overflow-auto">
-          <div className="min-w-full min-h-full overflow-auto bg-indigo-950">
+          <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
             <Table>
               <TableHeader className="bg-yellow-400 text-black">
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -255,6 +255,7 @@ export function ApprovalTable() {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      className={row.getIsSelected() ? "bg-red-300" : ""}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
@@ -306,16 +307,23 @@ export function ApprovalTable() {
               <DialogContent className="bg-white text-black">
                 <DialogHeader>
                   <DialogTitle>{actionType}Remarks</DialogTitle>
-                  <DialogDescription>
-                 
-                  </DialogDescription>
+                  <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Textarea className="bg-white text-black placeholder:Enter your Remarks" />
                 <DialogFooter>
                   <Button
                     variant="outline"
                     className="bg-green-600 text-white hover:bg-green-300"
-                    onClick={() => setActionType(null)} // Close the dialog
+                    onClick={() => {
+                      // Submit the remarks
+                      console.log("Submitted Remarks");
+
+                      // Deselect all rows
+                      setRowSelection({});
+
+                      // Close the dialog
+                      setActionType(null);
+                    }}
                   >
                     Submit
                   </Button>
