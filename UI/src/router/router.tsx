@@ -6,9 +6,9 @@ import Dashboard from "@/pages/dashboard";
 import Approval from "@/pages/approval";
 import Approvaltable from "@/pages/approvaltable";
 import { ReadingView } from "@/pages/reading";
-import DynamicGridTable from "@/pages/dynamicgrid";
 import LoginPage from "@/pages/Login";
 import View from "@/pages/view";
+import { DynamicGridTable } from "@/pages/dynamicgrid";
 
 
 
