@@ -19,6 +19,7 @@ namespace EngineeringLog.Controllers
             dashboardService = engineeringLogService;
 
         }
+
         [HttpGet("Map")]
         public async Task<IActionResult> GetMapByPlantId(string plantId)
         {
@@ -39,13 +40,6 @@ namespace EngineeringLog.Controllers
         {
             var result = dashboardService.GetLocations(frequency);
 
-            return Ok(result);
-        }
-
-        [HttpGet("fields")]
-        public async Task<IActionResult> GetFields(int locationId)
-        {
-            var result = await dashboardService.GetFields(locationId);
             return Ok(result);
         }
 
