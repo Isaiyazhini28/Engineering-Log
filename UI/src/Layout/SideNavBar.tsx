@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import SideNavBarButton from "./SideNavBarButton";
-import { PathList } from "@/Router/router";
+import { PathList } from "@/router/router";
 
 type SideNavBarType = {
   MenuClose?: (data: boolean) => void;
