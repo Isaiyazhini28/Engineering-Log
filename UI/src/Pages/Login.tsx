@@ -33,6 +33,7 @@ function LoginPage() {
     onSuccess: (response) => {
       console.log(response, "testlogin");
       sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem("UserDetails",JSON.stringify(response.user))
       window.location.reload();
     },
   });

@@ -8,33 +8,54 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "react-router-dom";
 import {
+  GetloginUserApiStore,
   useFieldsStore,
   useHtYardStore,
-  useSelectedLocationIdStore,
+  useSelectedLocationAndTransactionIDStore,
 } from "@/store/store";
 import { useEffect, useState } from "react";
 import { useGetFieldsBasedOnLocationIdQuery } from "@/services/query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateTransaByLocationIdAPI } from "@/services/api";
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
 
 function Dashboard() {
   const navigate = useNavigate();
-
+  
+  const [selectedEmployeeId, setselectedEmployeeId] = useState(0);
   const [selectedLoactionId, setSelectedLocationId] = useState(0);
-  const setLocationId = useSelectedLocationIdStore(
-    (state) => state.setLocationId
+  const UserDetails = JSON.parse(sessionStorage.getItem("UserDetails"));
+  const SelectedL_T_IDStore = useSelectedLocationAndTransactionIDStore(
+    (state) => state
   );
+  const { mutate: CreateTransaByLocationId } = useMutation({
+    mutationFn: (data: any) => CreateTransaByLocationIdAPI(data),
+    onError: (e) => {
+      console.log(e, "Error");
+    },
+    onSuccess: (data: any) => {
+      toast.success("Transacted successfully!");
+      if (data.status === 200) {
+        SelectedL_T_IDStore.setTransactionId(data.data);
+      }
+    },
+  });
 
   const DashboardData = useHtYardStore((state) => state.HtYard);
   const DashboardMonthlyData = useHtYardStore((state) => state.HtYardMonthly);
 
   const handleCardClick = (LocationDetails: any) => {
-    setLocationId(LocationDetails.id);
+    SelectedL_T_IDStore.setLocationId(LocationDetails.id);
+    CreateTransaByLocationId({
+      locationId: LocationDetails.id,
+      employeeId: UserDetails.id,
+    });
     navigate("/dynamicformcomp");
   };
 
   return (
     <div className="bg-yellow-100 h-full w-full p-2 flex flex-col overflow-auto">
-      
       <Tabs defaultValue="Daily" className="w-full">
         <div className="h-10 flex justify-start">
           <div className="flex justify-center items-center gap-1">
@@ -45,7 +66,6 @@ function Dashboard() {
           </div>
         </div>
         <TabsContent value="Daily">
-          
           <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 overflow-auto">
             {DashboardData.map((module, index) => (
               <Card
@@ -61,22 +81,24 @@ function Dashboard() {
                 </CardContent>
                 <CardFooter className="flex flex-col items-center justify-center">
                   {/* <p className="text-center">Completed</p> */}
-                  <p className={`text-center ${
-                module.status === "Completed"
-                  ? "text-green-500"
-                  : module.status === "Pending"
-                  ? "text-red-500"
-                  : ""
-              }`}>
-                {module.status}
-              </p>
+                  <p
+                    className={`text-center ${
+                      module.status === "Completed"
+                        ? "text-green-500"
+                        : module.status === "Pending"
+                        ? "text-red-500"
+                        : ""
+                    }`}
+                  >
+                    {module.status}
+                  </p>
                 </CardFooter>
               </Card>
             ))}
           </div>
         </TabsContent>
         <TabsContent value="Monthly">
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 overflow-auto">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 overflow-auto">
             {DashboardMonthlyData.map((module, index) => (
               <Card
                 key={index}
@@ -91,26 +113,24 @@ function Dashboard() {
                 </CardContent>
                 <CardFooter className="flex flex-col items-center justify-center">
                   {/* <p className="text-center">Completed</p> */}
-                  <p className={`text-center ${
-                module.status === "Completed"
-                  ? "text-green-500"
-                  : module.status === "Pending"
-                  ? "text-red-500"
-                  : ""
-              }`}>
-                {module.status}
-              </p>
+                  <p
+                    className={`text-center ${
+                      module.status === "Completed"
+                        ? "text-green-500"
+                        : module.status === "Pending"
+                        ? "text-red-500"
+                        : ""
+                    }`}
+                  >
+                    {module.status}
+                  </p>
                 </CardFooter>
               </Card>
             ))}
           </div>
-
-
         </TabsContent>
       </Tabs>
     </div>
-
-   
   );
 }
 

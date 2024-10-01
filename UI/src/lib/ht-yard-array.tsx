@@ -6,6 +6,8 @@ export type ArrayType = {
   hasChild:boolean; 
   name: string;
   type: string;
+  mtdavg:number;
+  PreviousReading:number;
   childFields?: ArrayType[];
 };
 export const HT_Yard_Array: ArrayType[] = [
@@ -16,7 +18,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-1",
@@ -25,7 +29,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-2",
@@ -35,7 +41,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-3",
@@ -44,7 +52,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-4",
@@ -53,7 +63,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-5",
@@ -63,7 +75,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M3-6",
@@ -73,7 +87,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-1",
@@ -83,7 +99,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-2",
@@ -93,7 +111,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-3",
@@ -103,7 +123,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-4",
@@ -113,7 +135,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-5",
@@ -123,7 +147,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "M5-6",
@@ -133,7 +159,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   
   {
@@ -148,7 +176,9 @@ export const HT_Yard_Array: ArrayType[] = [
         SequenceId: undefined,
         value: undefined,
         fieldId: undefined,
-        child: undefined
+        child: undefined,
+        mtdavg: 0,
+        PreviousReading: 0
       },
       {
         name: "UV HOUR",
@@ -158,7 +188,9 @@ export const HT_Yard_Array: ArrayType[] = [
         SequenceId: undefined,
         value: undefined,
         fieldId: undefined,
-        child: undefined
+        child: undefined,
+        mtdavg: 0,
+        PreviousReading: 0
       },
     ],
 
@@ -166,7 +198,9 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
   {
     name: "Near 10KL filling",
@@ -180,7 +214,9 @@ export const HT_Yard_Array: ArrayType[] = [
         SequenceId: undefined,
         value: undefined,
         fieldId: undefined,
-        child: undefined
+        child: undefined,
+        mtdavg: 0,
+        PreviousReading: 0
       },
       {
         name: "UV HOUR",
@@ -190,7 +226,9 @@ export const HT_Yard_Array: ArrayType[] = [
         SequenceId: undefined,
         value: undefined,
         fieldId: undefined,
-        child: undefined
+        child: undefined,
+        mtdavg: 0,
+        PreviousReading: 0
       },
     ],
 
@@ -198,6 +236,8 @@ export const HT_Yard_Array: ArrayType[] = [
     SequenceId: undefined,
     value: undefined,
     fieldId: undefined,
-    child: undefined
+    child: undefined,
+    mtdavg: 0,
+    PreviousReading: 0
   },
 ];

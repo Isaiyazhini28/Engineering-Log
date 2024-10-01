@@ -31,17 +31,58 @@ export interface HtYardInterface {
       }
     )
   );
-
-  type selectedLocationIdType={
+  type GetloginUserApiType={
+    id:string,
+    setid: (data: string) => void; 
+  }
+  export const GetloginUserApiStore = create<GetloginUserApiType>()(
+    persist(
+      (set) => ({
+        id: "", 
+        setid: (data: string) => { 
+          set(() => ({ id: data }));
+        },
+      }),
+      {
+        name: "Selected Employee Id", 
+        storage: createJSONStorage(() => sessionStorage), 
+      }
+    )
+  );
+//   type CreateTransaByLocationIdType={
+//     TransaByLocationId:number,
+//     setTransaByLocationId:(data:number)=>void;
+//   }
+//   export const useCreateTransaByLocationIdStore = create<CreateTransaByLocationIdType>()(
+//     persist(
+//       (set) => ({
+//         TransaByLocationId: 0,
+//         setTransaByLocationId: (data: number) => {
+//           set(() => ({ TransaByLocationId: data }));
+//         },
+//       }),
+//       {
+//         name: "Create TransaByLocation Id",
+//         storage: createJSONStorage(() => sessionStorage),
+//       }
+//     )
+//   );
+  type selectedLocationAndTransactionIDType={
     LocationId:number,
     setLocationId:(data:number)=>void;
+    transactionId:number,
+    setTransactionId:(data:number)=>void;
   }
-  export const useSelectedLocationIdStore = create<selectedLocationIdType>()(
+  export const useSelectedLocationAndTransactionIDStore = create<selectedLocationAndTransactionIDType>()(
     persist(
       (set) => ({
         LocationId: 0,
+        transactionId:0,
         setLocationId: (data: number) => {
           set(() => ({ LocationId: data }));
+        },
+        setTransactionId: (data: number) => {
+          set(() => ({ transactionId: data }));
         },
       }),
       {
@@ -85,9 +126,10 @@ export interface HtYardInterface {
   );
 interface DynamicFormInsertInterface {
   value:number,
-  fieldId:number,
-  subFieldId:number,
+  transactionValueId:number,
+  employeeId:string,
   difference:number,
+  reset:boolean,
 }
 
   type selectedDynamicFormInsertType={

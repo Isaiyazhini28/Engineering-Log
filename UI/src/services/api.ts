@@ -16,14 +16,15 @@ export const setAuthIncerceptor = (token: string) => {
   axiosEngineeringLog.defaults.headers.Authorization = `Bearer ${token}`;
 };
 
-// Function to handle the login request
+
 export const loginUserApi = async (data: any) => {
  
-    // Make the POST request to the '/Login' endpoint
+  
     const response = await axiosLogin.post('/login', data);
     return response.data;
 
 };
+
 
 export const GetDashboardAPI=async()=>{
   const res=(await axiosEngineeringLog.get("/Dashboard/location?frequency=1")).data
@@ -36,23 +37,29 @@ export const GetDashboardMonthlyAPI=async()=>{
 };
 
 export const GetFieldsBasedOnLocationIdAPI=async(params:any)=>{
-  const res=(await axiosEngineeringLog.get("Dashboard/fields",{
+  const res=(await axiosEngineeringLog.get("/Form/GetFieldsByLocationId",{
     params,
     paramsSerializer:{indexes:true}
   })).data
   return res
 }
 
-export const DynamicFormInsertAPI = async (data: any) => {
-  return await axiosEngineeringLog.post("/Dashboard/Form", data);
+export const UpdateFieldvalueAPI = async (data: any) => {
+  return await axiosEngineeringLog.put("/Form/UpdateFieldvalue", data);
+};
+
+export const CreateTransaByLocationIdAPI = async (data: any) => {
+  return await axiosEngineeringLog.post("/Form/CreateTransaByLocationId", data);
 };
 
 
 
-export const InsertDataApi = async (data:any,locationID:number)=> {
-  const Res=(await axiosEngineeringLog.post("Dashboard/fields?locationId="+locationID,data))
-  return Res
-};
+
+
+// export const InsertDataApi = async (data:any,locationID:number)=> {
+//   const Res=(await axiosEngineeringLog.post("Dashboard/fields?locationId="+locationID,data))
+//   return Res
+// };
 
 // export const GetFieldsBasedOnLocationIdAPI=async(params:any)=>{
 //   const res=(await axiosEngineeringLog.get("EngineeringLog/form",{
