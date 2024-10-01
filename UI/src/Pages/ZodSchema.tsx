@@ -9,13 +9,13 @@ export const createZodSchema = (fields: []): z.ZodObject<ZodRawShape> => {
       fieldSchema = field.hasChild
         ? z.string().optional()
         : z
-            .string({required_error:` ${field.name} is mandatory`})
-            .min(1, { message: `${field.name} should not be empty` })
+            .string({required_error:` ${field.fieldName } is mandatory`})
+            .min(1, { message: `${field.fieldName } should not be empty` })
             .refine((value) => !isNaN(Number(value)), {
-              message:` ${field.name} should be a number`,
+              message:` ${field.fieldName } should be a number`,
             });
     } else if (field.type === "string") {
-      fieldSchema = z.string().min(1, { message: `${field.name} should not be empty` });
+      fieldSchema = z.string().min(1, { message: `${field.fieldName } should not be empty` });
     
     }
 
@@ -26,7 +26,7 @@ export const createZodSchema = (fields: []): z.ZodObject<ZodRawShape> => {
     }
 
   
-    acc[`${field.name}`] = fieldSchema;
+    acc[`${field.subFieldId!==null?field.subFieldName+"/"+field.fieldName :field.fieldName }`] = fieldSchema;
     return acc;
   }, {});
 

@@ -2,9 +2,13 @@
 // import { customerTypeMasterApi } from "./api";
 
 import { useQuery } from "@tanstack/react-query";
-import { GetDashboardAPI, GetDashboardMonthlyAPI, GetFieldsBasedOnLocationIdAPI  } from "./api";
+import {
+  CreateTransaByLocationIdAPI,
+  GetDashboardAPI,
+  GetDashboardMonthlyAPI,
+  GetFieldsBasedOnLocationIdAPI,
+} from "./api";
 
-// // queryClient.ts (or wherever you initialize your QueryClient)
 export function useGetDashboardQuery() {
   return useQuery({
     queryKey: ["Get Dashboard"],
@@ -23,15 +27,22 @@ export function useGetDashboardMonthlyQuery() {
   });
 }
 
-export function useGetFieldsBasedOnLocationIdQuery(data:any) {
+export function useGetFieldsBasedOnLocationIdAPIQuery(data: any) {
   return useQuery({
-    queryKey: ["Get Fields Based On Location Id",data.LocationId],
+    queryKey: ["FieldsBasedOnLocationId", data.locationId],
     queryFn: () => GetFieldsBasedOnLocationIdAPI(data),
     staleTime: Infinity,
     gcTime: Infinity,
-    enabled:(data.LocationId!==0)
+    enabled: data.LocationId !== 0,
   });
 }
 
+// export function TransaByLocationIdAPIQuery(data:any) {
+//   return useQuery({
+//     queryKey: ["Transaction Id",data.TransactionId],
+//     queryFn: () => GetTransaByLocationIdAPI(data),
+//     staleTime: Infinity,
+//     gcTime: Infinity,
 
-
+//   });
+// }
