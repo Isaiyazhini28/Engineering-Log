@@ -23,14 +23,14 @@ namespace EngineeringLog.Controllers
         public async Task<IActionResult> CreateTransaction(CreateTransactionRequest request)
         {
        
-                int response = await _formService.CreateTransactionAsync(request);
+                int response = await _formService.CreateTransaction(request);
                 return Ok(response);
         }
 
         [HttpGet("GetFieldsByLocationId")]
         public async Task<IActionResult> GetOpenTransactionValues(int locationId)
         {
-            var result = await _formService.GetOpenTransactionValuesAsync(locationId);
+            var result = await _formService.GetOpenTransactionValues(locationId);
             return Ok(result);
         }
 
@@ -42,7 +42,7 @@ namespace EngineeringLog.Controllers
                 return BadRequest("Invalid request.");
             }
 
-            var result = await _formService.UpdateTransactionValueAsync(request);
+            var result = await _formService.UpdateTransactionValue(request);
 
             return Ok(result);
         }
@@ -55,9 +55,9 @@ namespace EngineeringLog.Controllers
                 return BadRequest("Invalid request.");
             }
 
-            var result = await _formService.UpdateTransactionStatusAsync(request);
+            var result = await _formService.UpdateTransactionStatus(request);
             
-                return Ok($"{result} updated successfully.");
+                return Ok(result);
         }
 
         [HttpGet("ViewPage")]
