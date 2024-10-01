@@ -5,17 +5,22 @@ namespace EngineeringLog.Services.IServices
 {
     public interface IFormService
     {
-        
-        //Task<string>CreateTransaction(TransactionRequest request
-        //Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request);
+        //InsertPage
+        Task<int> CreateTransaction(CreateTransactionRequest request);
+
+        Task<TransactionValueResponse> GetOpenTransactionValues(int locationId);
+        Task<string> UpdateTransactionStatus(UpdateTransactionStatusRequest request);
+        Task<string> UpdateTransactionValue(UpdateTransactionValueRequest request);
+
+        //ViewPage
         Task<ViewPageResponse> GetViewPage(int locationId);
         Task<List<TransactionLogResponse>> GetTransactionLogById(int transactionId); 
+        //ApproverPage
         Task<ApproverResponse> ApproveTransaction(int transactionId, ApproverRequest request);
         Task<MultipleTransaApproverResponse> CompleteMultipleTransactions(MultipleTransaApproverRequest request);
 
-        Task<int> CreateTransaction(CreateTransactionRequest request);
-        Task<string> UpdateTransactionStatus(UpdateTransactionStatusRequest request);
-        Task<TransactionValueResponse> GetOpenTransactionValues(int locationId);
-        Task<int> UpdateTransactionValue(UpdateTransactionValueRequest request);
+        //Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request);  
+
+
     }
 }

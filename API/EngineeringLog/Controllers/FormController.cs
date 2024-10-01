@@ -57,7 +57,7 @@ namespace EngineeringLog.Controllers
 
             var result = await _formService.UpdateTransactionStatus(request);
             
-                return Ok($"{result} updated successfully.");
+                return Ok(result);
         }
 
         [HttpGet("ViewPage")]

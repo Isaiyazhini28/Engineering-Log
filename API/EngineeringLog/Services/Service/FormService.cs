@@ -4,6 +4,7 @@ using EngineeringLog.Models.Request;
 using EngineeringLog.Models.Response;
 using EngineeringLog.Services.IServices;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace EngineeringLog.Services.Service
 {
@@ -50,16 +51,6 @@ namespace EngineeringLog.Services.Service
             _dbContext.TransactionEntries.Add(transactionEntry);
             await _dbContext.SaveChangesAsync();
 
-            var activityLog = new ActivityLog
-            {
-                TransactionId = transactionEntry.Id,
-                Action = $"Created Transaction in {transactionEntry.Location.Name}" ,
-                CreatedBy = request.EmployeeId,
-                CreatedAt = DateTime.UtcNow
-            };
-            _dbContext.ActivityLogs.Add(activityLog);
-            await _dbContext.SaveChangesAsync();
-
             var fieldMasters = await _dbContext.FieldMasters
                                 .Include(f => f.SubFields)
                                 .Where(f => f.LocationId == request.LocationId)
@@ -95,11 +86,29 @@ namespace EngineeringLog.Services.Service
             );
             await _dbContext.TransactionValues.AddRangeAsync(transactionValues);
             await _dbContext.SaveChangesAsync();
+            var location = await _dbContext.LocationMasters
+                            .Where(l => l.Id == request.LocationId)
+                            .FirstOrDefaultAsync();
+            var activityLog = new ActivityLog
+            {
+                TransactionId = transactionEntry.Id,
+                Action = $"Created Transaction in {location.Name}",
+                CreatedBy = request.EmployeeId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedBy = request.EmployeeId,
+                ModifiedAt = DateTime.UtcNow
+            };
+            _dbContext.ActivityLogs.Add(activityLog);
+            await _dbContext.SaveChangesAsync();
+
             return transactionEntry.Id;
         }
 
         public async Task<TransactionValueResponse> GetOpenTransactionValues(int locationId)
         {
+            List<ViewPagePreReaResponse> previousReadings = await GetPreviousReadings(locationId);
+            List<MtdAverageResponse> mtdAverages = await MTDAverage(locationId);
+            List<PreviousMonthAvgResponse> previousMonthAverages = await PreviousMonthAverage(locationId);
             var transactionValues = await _dbContext.TransactionValues
                 .Include(tv => tv.Field) 
                 .Include(tv => tv.SubField) 
@@ -110,14 +119,50 @@ namespace EngineeringLog.Services.Service
                     TransactionValueId = tv.Id,
                     FieldId = tv.Field.Id,
                     FieldName = tv.Field.Name,
+                    FieldSequenceId=tv.Field.SequenceId,
                     SubFieldId = tv.SubField.Id,
                     SubFieldName = tv.SubField != null ? tv.SubField.Name : null,
+                    SubFieldSequenceId=tv.SubFieldId != null ? tv.SubField.SequenceId: null, 
                     Value = tv.Value,
                     Difference = tv.Difference,
-                    Frequency = tv.Field.Frequency
+                    Frequency = tv.Field.Frequency,
+                    Type= tv.Field.Type
                 })
                 .ToListAsync();
+            foreach (var field in transactionValues.GroupBy(tv => tv.FieldId))
+            {
+                var currentField = field.FirstOrDefault();
 
+                if (field.Any(f => f.SubFieldId != null))
+                {
+                    foreach (var subField in field.Where(f => f.SubFieldId != null))
+                    {
+                        subField.PreviousReading = previousReadings
+                            .Where(x => x.FieldId == subField.FieldId && x.SubFieldId == subField.SubFieldId)
+                            .Select(x => x.LastReading).FirstOrDefault() ?? string.Empty;
+
+                        subField.MtdAvg = mtdAverages
+                            .Where(x => x.FieldId == subField.FieldId && x.SubFieldId == subField.SubFieldId)
+                            .Select(x => x.MtdAverage).FirstOrDefault();
+
+                        subField.PreviousMonthAvg = previousMonthAverages
+                            .Where(x => x.FieldId == subField.FieldId && x.SubFieldId == subField.SubFieldId)
+                            .Select(x => x.PreviousMonthAvg).FirstOrDefault();
+                    }
+                }
+                else
+                {
+                    currentField.PreviousReading = previousReadings
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Select(x => x.LastReading).FirstOrDefault() ?? string.Empty;
+                    currentField.MtdAvg = mtdAverages
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Select(x => x.MtdAverage).FirstOrDefault();
+                    currentField.PreviousMonthAvg = previousMonthAverages
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Select(x => x.PreviousMonthAvg).FirstOrDefault();
+                }
+            }
             var groupedTransactionValues = new TransactionValueResponse
             {
                 DailyFields = transactionValues.Where(tv => tv.Frequency == FrequencyType.Daily).ToList(),
@@ -127,10 +172,11 @@ namespace EngineeringLog.Services.Service
             return groupedTransactionValues;
         }
 
-        public async Task<int> UpdateTransactionValue(UpdateTransactionValueRequest request)
+        public async Task<string> UpdateTransactionValue(UpdateTransactionValueRequest request)
         {
             var transactionValue = await _dbContext.TransactionValues
-                .Include(tv => tv.Transaction) 
+                .Include(tv => tv.Transaction)
+                .Include(tv => tv.Field)
                 .FirstOrDefaultAsync(tv => tv.Id == request.TransactionValueId);
 
             transactionValue.Value = request.Value;
@@ -171,8 +217,21 @@ namespace EngineeringLog.Services.Service
             transactionValue.Transaction.RevisedBy = request.EmployeeId;
 
             await _dbContext.SaveChangesAsync();
+            var activityLog = new ActivityLog
+            {
+                TransactionId = transactionValue.Transaction.Id,
+                Action = $"Updated {transactionValue.Field.Name}",
+                CreatedBy = request.EmployeeId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedBy = request.EmployeeId,
+                ModifiedAt = DateTime.UtcNow
+            };
+            _dbContext.ActivityLogs.Add(activityLog);
+            await _dbContext.SaveChangesAsync();
 
-            return request.TransactionValueId;
+            string response = transactionValue.Field.Name;
+
+            return $"{response} updated successfully.";
         }
 
         public async Task<string> UpdateTransactionStatus(UpdateTransactionStatusRequest request)
@@ -200,7 +259,7 @@ namespace EngineeringLog.Services.Service
             await _dbContext.SaveChangesAsync();
             string response= transactionEntry.Location.Name;
 
-            return response; 
+            return $"{response} updated successfully."; 
         }
 
         public async Task<ViewPageResponse> GetViewPage(int locationId)
@@ -280,7 +339,6 @@ namespace EngineeringLog.Services.Service
                 Fields = fields
             };
 
-  
             return response;
 
         }
@@ -397,7 +455,7 @@ namespace EngineeringLog.Services.Service
                 .ToListAsync(); 
 
             return transactionLogs; 
-        }
+        } 
 
         public async Task<ApproverResponse> ApproveTransaction(int transactionId, ApproverRequest request)
             {
