@@ -194,7 +194,7 @@ export function ReadingView() {
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto relative h-full">
                 <div className="absolute w-full h-full border-none rounded-sm md:border-2">
-                  <ScrollArea className="h-[100%] relative  w-full rounded-md border-none bg-red-400" >
+                  <ScrollArea className="h-[100%] relative w-full rounded-sm border-none bg-red-400" >
                     <Table>
                       <TableHeader className="bg-yellow-400 text-black ">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -244,9 +244,9 @@ export function ReadingView() {
                   </ScrollArea>
                 </div>
               </div>
-              <div className="h-64 overflow-auto">
-                <div className="border-t pt-2 flex flex-col">
-                  <label className="font-semibold mt-10">Add a Comment</label>
+              <div className="h-48 overflow-auto">
+                <div className="flex flex-col">
+                  <label className="font-semibold">Add a Comment</label>
                   <div className="relative flex-grow">
                     <textarea
                       value={remark}
@@ -271,7 +271,7 @@ export function ReadingView() {
           <div className="w-80">
             <div className="h-full w-full">
               <div className="flex h-full w-full flex-col">
-                <div className="h-12 bg-yellow-400 text-black flex justify-center items-center">ACTIVITY LOG</div>
+                <div className="h-12 bg-yellow-400 text-black flex rounded-sm justify-center items-center">ACTIVITY LOG</div>
                 <div className="flex-1 mr-1 ml-1 p-4 overflow-auto">
                   {[
                     { label: "Transaction ID", value: "" },
@@ -292,7 +292,7 @@ export function ReadingView() {
                 </div>
 
                 <div className="mr-2 ml-2 mb-4">
-                  <div className="relative flex items-center h-24">
+                  <div className="relative flex items-center">
                     <textarea
                       value={logComment}
                       onChange={(e) => setLogComment(e.target.value)}
