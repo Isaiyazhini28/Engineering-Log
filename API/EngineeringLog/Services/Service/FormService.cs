@@ -24,7 +24,7 @@ namespace EngineeringLog.Services.Service
                 .Count();
             string serialNumber = (transactionCount + 1).ToString("D4");
             return $"{currentDate}-{locationId}-{serialNumber}";
-        }
+        }   
 
         public async Task<int> CreateTransaction(CreateTransactionRequest request)
         {
@@ -381,8 +381,6 @@ namespace EngineeringLog.Services.Service
             {
                 return new List<ViewPagePreReaResponse>();
             }
-
-            // Retrieve previous readings from the last transaction
             var lastReadings = await _dbContext.TransactionValues
                                         .Where(tv => tv.TransactionId == lastTransaction)
                                         .Select(g => new ViewPagePreReaResponse
@@ -455,118 +453,202 @@ namespace EngineeringLog.Services.Service
                 .ToListAsync(); 
 
             return transactionLogs; 
-        } 
-
-        public async Task<ApproverResponse> ApproveTransaction(int transactionId, ApproverRequest request)
-            {
-            var transactionEntry = await _dbContext.TransactionEntries
-                .FirstOrDefaultAsync(te => te.Id == transactionId);
-            if (transactionEntry == null)
-            {
-                return new ApproverResponse
-                {
-                    TransactionId = transactionId,
-                    Message = "Transaction not found",
-                };
-            }
-            transactionEntry.ApprovalStatus = ApprovalStatus.Complete;
-            transactionEntry.Remarks = request.Remark;
-            transactionEntry.ActionBy = request.EmpId;
-            transactionEntry.ActionAt = DateTime.UtcNow;
-            _dbContext.TransactionEntries.Update(transactionEntry);
-
-            var activityLog = new ActivityLog
-            {
-                TransactionId = transactionEntry.Id,
-                Action = "Approved " + transactionEntry.RefId,
-                CreatedBy = request.EmpId,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedBy = request.EmpId,
-                ModifiedAt = DateTime.UtcNow
-            };
-            _dbContext.ActivityLogs.Add(activityLog);
-            await _dbContext.SaveChangesAsync();
-            return new ApproverResponse
-            {
-                TransactionId = transactionEntry.Id,
-                Message = "Approved-" + transactionEntry.RefId,
-            };
         }
 
-        public async Task<ApproverResponse> RejectTransaction(int transactionId, ApproverRequest request)
+        public async Task<ViewPageGridResponse> GetViewPageGrid(int pageNo, int pageSize, int locationId)
         {
-            var transactionEntry = await _dbContext.TransactionEntries
-                .FirstOrDefaultAsync(te => te.Id == transactionId);
-            if (transactionEntry == null)
-            {
-                return new ApproverResponse
+
+            var totalCount = await _dbContext.TransactionEntries.Where(te => te.LocationId == locationId).CountAsync();
+            var transactionEntries = await _dbContext.TransactionEntries.Where(te => te.LocationId == locationId).OrderByDescending(te => te.CreatedDate)
+                .Skip((pageNo - 1) * pageSize)
+                .Take(pageSize)
+                .Select(te => new TransactionEntryResponse
                 {
-                    TransactionId = transactionId,
-                    Message = "Transaction not found",
-                };
-            }
-            transactionEntry.ApprovalStatus = ApprovalStatus.Reject;
-            transactionEntry.Remarks = request.Remark;
-            transactionEntry.ActionBy = request.EmpId;
-            transactionEntry.ActionAt = DateTime.UtcNow;
-            _dbContext.TransactionEntries.Update(transactionEntry);
-            var activityLog = new ActivityLog
+                    TransactionId = te.Id,
+                    RefId = te.RefId,
+                    LocationId = te.LocationId,
+                    CreatedDate = te.CreatedDate,
+                    ApprovalStatus = te.ApprovalStatus,
+                    Remarks = te.Remarks,
+                    TransactionValues = _dbContext.TransactionValues
+                        .Where(tv => tv.TransactionId == te.Id)
+                        .Select(tv => new ViewPageTransactionValueResponse
+                        {
+                            ValueId = tv.Id,
+                            FieldId = tv.FieldId,
+                            FieldSequenceId = tv.Field.SequenceId,
+                            FieldName = tv.Field.Name,
+                            SubFieldId = tv.SubField.Id,
+                            SubFieldSequenceId = tv.SubFieldId != null ? tv.SubField.SequenceId : null,
+                            SubFieldName = tv.SubField != null ? tv.SubField.Name : null,
+                            Value = tv.Value
+                        }).ToList()
+                }).ToListAsync();
+            return new ViewPageGridResponse
             {
-                TransactionId = transactionEntry.Id,
-                Action = "Rejected" + transactionEntry.RefId,
-                CreatedBy=request.EmpId,
-                CreatedAt = DateTime.UtcNow,
-                ModifiedBy = request.EmpId,
-                ModifiedAt = DateTime.UtcNow
-            };
-            _dbContext.ActivityLogs.Add(activityLog);
-            await _dbContext.SaveChangesAsync();
-            return new ApproverResponse
-            {
-                TransactionId = transactionEntry.Id,
-                Message = "Rejected-" + transactionEntry.RefId,
+                Count = totalCount,
+                Data = transactionEntries
             };
         }
-         public async Task<MultipleTransaApproverResponse> CompleteMultipleTransactions(MultipleTransaApproverRequest request)
-         {
-             var completedTransactionIds = new List<int>();
 
-             foreach (var transactionId in request.TransactionIds)
-             {
-                 // Retrieve the transaction entry by ID
-                 var transactionEntry = await _dbContext.TransactionEntries
-                     .FirstOrDefaultAsync(te => te.Id == transactionId);
+        public async Task<TransactionDetaiedResponse> GetTransactionDetails(int transactionId)
+        {
+            // Fetch the transaction entry
+            var transactionEntry = await _dbContext.TransactionEntries
+                .Include(te => te.Location)
+                .FirstOrDefaultAsync(te => te.Id == transactionId);
+
+            if (transactionEntry == null)
+            {
+                return null; 
+            }
+
+            var transactionValues = await _dbContext.TransactionValues
+                .Where(tv => tv.TransactionId == transactionId)
+                .Include(tv => tv.Field)
+                .Include(tv => tv.SubField)
+                .ToListAsync();
+            var previousReadings = await PreviousReadings(transactionEntry.LocationId, transactionEntry.CreatedDate);
+            var mtdAvg = await MTDAverage(transactionEntry.LocationId, transactionEntry.CreatedDate);
+            var previousMonthAvg = await PreviousMonthAverage(transactionEntry.LocationId, transactionEntry.CreatedDate);
+            var response = new TransactionDetaiedResponse
+            {
+                CurrentReadingTransactionId = transactionEntry.Id,
+                LocationId = transactionEntry.LocationId,
+                LocationName = transactionEntry.Location.Name,
+                ReferenceNo = transactionEntry.RefId,
+                ApprovalStatus = transactionEntry.ApprovalStatus,
+                Fields = transactionValues.Select(tv => new TransactionFieldResponse
+                {
+                    TransactionValueId = tv.Id,
+                    FieldId = tv.FieldId,
+                    FieldName = tv.Field.Name,
+                    FieldSequenceId = tv.Field.SequenceId,
+                    SubFieldId = tv.SubField?.Id,
+                    SubFieldName = tv.SubField?.Name,
+                    SubFieldSequenceId = tv.SubField?.SequenceId,
+                    Value = tv.Value,
+                    Difference = tv.Difference,
+                    Type = tv.Field.Type,
+                    Frequency = tv.Field.Frequency,
+                    PreviousReading = previousReadings.FirstOrDefault(pr => pr.FieldId == tv.FieldId && pr.SubFieldId == tv.SubFieldId)?.LastReading,
+                    MtdAvg = mtdAvg.FirstOrDefault(m => m.FieldId == tv.FieldId && m.SubFieldId == tv.SubFieldId)?.MtdAverage ?? 0,
+                    PreviousMonthAvg = previousMonthAvg.FirstOrDefault(pm => pm.FieldId == tv.FieldId && pm.SubFieldId == tv.SubFieldId)?.PreviousMonthAvg ?? 0
+                }).ToList()
+            };
+
+            return response;
+        }
+
+        private async Task<List<ViewPagePreReaResponse>> PreviousReadings(int locationId, DateTime transactionDate)
+        {
+            
+            var lastTransaction = await _dbContext.TransactionEntries
+                .Where(te => te.LocationId == locationId && te.CreatedDate < transactionDate)
+                .OrderByDescending(te => te.CreatedDate)
+                .Select(te => te.Id)
+                .FirstOrDefaultAsync();
+
+            if (lastTransaction == 0)
+            {
+                return new List<ViewPagePreReaResponse>();
+            }
+
+            var lastReadings = await _dbContext.TransactionValues
+                .Where(tv => tv.TransactionId == lastTransaction)
+                .Select(g => new ViewPagePreReaResponse
+                {
+                    FieldId = g.FieldId,
+                    SubFieldId = g.SubFieldId,
+                    LastReading = g.Value
+                }).ToListAsync();
+
+            return lastReadings;
+        }
+
+        private async Task<List<MtdAverageResponse>> MTDAverage(int locationId, DateTime transactionDate)
+        {
+            var startOfMonth = new DateTime(transactionDate.Year, transactionDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var currentDate = transactionDate;
+
+            var mtdAvgData = await (from te in _dbContext.TransactionEntries
+                                    join tv in _dbContext.TransactionValues on te.Id equals tv.TransactionId
+                                    where te.LocationId == locationId &&
+                                          te.CreatedDate >= startOfMonth &&
+                                          te.CreatedDate <= currentDate
+                                    group tv by new { tv.FieldId, tv.SubFieldId } into fieldGroup
+                                    select new MtdAverageResponse
+                                    {
+                                        FieldId = fieldGroup.Key.FieldId,
+                                        SubFieldId = fieldGroup.Key.SubFieldId,
+                                        MtdAverage = fieldGroup.Average(x => x.Difference)
+                                    }).ToListAsync();
+
+            return mtdAvgData;
+        }
+
+        private async Task<List<PreviousMonthAvgResponse>> PreviousMonthAverage(int locationId, DateTime transactionDate)
+        {
+            var firstDayOfCurrentMonth = new DateTime(transactionDate.Year, transactionDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var lastDayOfPreviousMonth = firstDayOfCurrentMonth.AddDays(-1);
+            var firstDayOfPreviousMonth = new DateTime(lastDayOfPreviousMonth.Year, lastDayOfPreviousMonth.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            var previousMonthAvgData = await (from te in _dbContext.TransactionEntries
+                                              join tv in _dbContext.TransactionValues on te.Id equals tv.TransactionId
+                                              where te.LocationId == locationId &&
+                                                    te.CreatedDate >= firstDayOfPreviousMonth &&
+                                                    te.CreatedDate <= lastDayOfPreviousMonth
+                                              group tv by new { tv.FieldId, tv.SubFieldId } into fieldGroup
+                                              select new PreviousMonthAvgResponse
+                                              {
+                                                  FieldId = fieldGroup.Key.FieldId,
+                                                  SubFieldId = fieldGroup.Key.SubFieldId,
+                                                  PreviousMonthAvg = fieldGroup.Average(x => x.Difference)
+                                              }).ToListAsync();
+
+            return previousMonthAvgData;
+        }
 
 
-                 transactionEntry.ApprovalStatus = ApprovalStatus.Complete;
-                 transactionEntry.Remarks = request.Remark;
-                 transactionEntry.ActionBy = request.EmpId;
-                 transactionEntry.ActionAt = DateTime.UtcNow;
+        public async Task<TransaApproverResponse> TransactionsApproval(ApproverRequest request)
+        {
+            var completedTransactionIds = new List<int>();
+            var actionType = request.IsApproved ? "Approved" : "Rejected";
 
-                 _dbContext.TransactionEntries.Update(transactionEntry);
+            foreach (var transaction in request.Transactions)
+            {
+                var transactionEntry = await _dbContext.TransactionEntries
+                    .FirstOrDefaultAsync(te => te.Id == transaction.TransactionId);
 
-                 var activityLog = new ActivityLog
-                 {
-                     TransactionId = transactionEntry.Id,
-                     Action = "Approved-"+transactionEntry.RefId,
-                     CreatedBy = request.EmpId,
-                     CreatedAt = DateTime.UtcNow,
-                     ModifiedBy = request.EmpId,
-                     ModifiedAt = DateTime.UtcNow
-                 };
+                if (transactionEntry != null)
+                {
+                    transactionEntry.ApprovalStatus = request.IsApproved ? ApprovalStatus.Complete : ApprovalStatus.Reject;
+                    transactionEntry.Remarks = transaction.Remarks ?? string.Empty;
+                    transactionEntry.ActionBy = request.EmpId;
+                    transactionEntry.ActionAt = DateTime.UtcNow;
+                    _dbContext.TransactionEntries.Update(transactionEntry);
+                    var activityLog = new ActivityLog
+                    {
+                        TransactionId = transactionEntry.Id,
+                        Action = $"{actionType}-{transactionEntry.RefId}",
+                        CreatedBy = request.EmpId,
+                        CreatedAt = DateTime.UtcNow,
+                        ModifiedBy = request.EmpId,
+                        ModifiedAt = DateTime.UtcNow
+                    };
+                    _dbContext.ActivityLogs.Add(activityLog);
+                    completedTransactionIds.Add(transaction.TransactionId);
+                }
+            }
+            await _dbContext.SaveChangesAsync();
 
-                 _dbContext.ActivityLogs.Add(activityLog);
-                 completedTransactionIds.Add(transactionId);
-             }
+            return new TransaApproverResponse
+            {
+                CompletedTransactionIds = completedTransactionIds,
+                Message = $"{actionType} {completedTransactionIds.Count} transaction(s)."
+            };
+        }
 
-             await _dbContext.SaveChangesAsync();
-
-             return new MultipleTransaApproverResponse
-             {
-                 CompletedTransactionIds = completedTransactionIds,
-                 Message = $"Approved {completedTransactionIds.Count} transaction(s)."
-             };
-         }
 
     }
 }
