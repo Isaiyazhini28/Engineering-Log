@@ -42,11 +42,16 @@ namespace EngineeringLog.Controllers
 
             return Ok(result);
         }
-
-        [HttpGet("ApproverDashboard")]
-        public async Task<IActionResult> GetApproverDashboard(int frequency)
+        [HttpGet("ViewPageDashboard")]
+        public async Task<IActionResult> GetAllLocations()
         {
-            var result = await dashboardService.GetApproverDashboard(frequency);
+            var result = await dashboardService.GetAllLocations();
+            return Ok(result);
+        }
+        [HttpGet("ApproverDashboard")]
+        public async Task<IActionResult> GetApproverDashboard()
+        {
+            var result = await dashboardService.GetApproverDashboard();
             return Ok(result);
 
         }

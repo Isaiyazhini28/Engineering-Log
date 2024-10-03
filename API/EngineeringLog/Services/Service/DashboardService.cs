@@ -39,16 +39,30 @@ namespace EngineeringLog.Services.Service
                     Id = x.Id,
                     Name = x.Name,
                     SequenceId = x.SequenceId,
-                    Status = _dbContext.TransactionEntries.Where(te => te.CreatedDate.Date == DateTime.UtcNow.Date)
+                    Status = _dbContext.TransactionEntries.Where(te => te.CreatedDate.Date == DateTime.UtcNow.Date && te.ApprovalStatus != ApprovalStatus.Open)
                                .Select(te => te.LocationId).Contains(x.Id) ? true : false
                 })
                 .ToList();
             return locations;
         }
-       
-        public async Task<List<ApproverLocationResponse>> GetApproverDashboard(int frequency)
+
+        public async Task<List<AllLocationResponse>> GetAllLocations()
         {
-            List<ApproverLocationResponse> locations = await _dbContext.LocationMasters.Where(x => x.IsActive && x.Fields.Any(f => f.Frequency == (FrequencyType)frequency && f.IsActive))
+            List<AllLocationResponse> locations = await _dbContext.LocationMasters
+                .Where(x => x.IsActive == true)
+                .Select(x => new AllLocationResponse
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    SequenceId = x.SequenceId
+                })
+                .ToListAsync();
+            return locations;
+
+        }
+        public async Task<List<ApproverLocationResponse>> GetApproverDashboard()
+        {
+            List<ApproverLocationResponse> locations = await _dbContext.LocationMasters.Where(x => x.IsActive && x.Fields.Any(f => f.IsActive))
                                                                .Select(x => new ApproverLocationResponse
                                                                {
                                                                    LocationId = x.Id,

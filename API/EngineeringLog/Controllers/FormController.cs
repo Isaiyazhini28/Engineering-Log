@@ -48,7 +48,7 @@ namespace EngineeringLog.Controllers
         }
 
         [HttpPut("UpdateTransactionStatus")]
-        public async Task<IActionResult> UpdateTransactionStatus([FromBody] UpdateTransactionStatusRequest request)
+        public async Task<IActionResult> UpdateTransactionStatus( UpdateTransactionStatusRequest request)
         {
             if (request == null)
             {
@@ -60,7 +60,7 @@ namespace EngineeringLog.Controllers
                 return Ok(result);
         }
 
-        [HttpGet("ViewPage")]
+       /* [HttpGet("ViewPage")]
         public async Task<IActionResult> GetViewPage(int locationId)
         {
             var result = await _formService.GetViewPage(locationId);
@@ -69,9 +69,30 @@ namespace EngineeringLog.Controllers
                 return NotFound();
             }
             return Ok(result);
-        }
+        }*/
 
-        [HttpGet("activityLog")]
+        [HttpGet("GetViewPageGrid")]
+        public async Task<IActionResult> GetViewPageGrid(int PageNo,int PageSize,int locationId)
+        {
+           
+                var response = await _formService.GetViewPageGrid(PageNo,PageSize,locationId);
+                return Ok(response);
+            
+           
+        }
+        [HttpGet("GetViewPageDetailed")]
+        public async Task<IActionResult> GetTransactionDetails(int transactionId)
+        {
+            var transactionDetails = await _formService.GetTransactionDetails(transactionId);
+
+            if (transactionDetails == null)
+            {
+                return NotFound(); 
+            }
+
+            return Ok(transactionDetails); 
+        }
+        [HttpGet("ActivityLog")]
         public async Task<IActionResult> GetTransactionLogById(int transactionId)
         {
             var result = await _formService.GetTransactionLogById(transactionId);
@@ -83,18 +104,11 @@ namespace EngineeringLog.Controllers
 
             return Ok(result);
         }
-       /* 
-        [HttpPut("ApproverTransaction")]
-        public async Task<IActionResult> ApproveTransaction(int transactionId, [FromBody] ApproverRequest request)
-        {
-            var result = await _formService.ApproveTransaction(transactionId, request);
-            return Ok(result);
-        }
        
-        [HttpPut("CompleteMultipleTransactions")]
-        public async Task<IActionResult> CompleteMultipleTransactions([FromBody] MultipleTransaApproverRequest request)
+        [HttpPut("TransactionsApproval")]
+        public async Task<IActionResult> TransactionsApproval( ApproverRequest request)
         {
-            var result = await _formService.CompleteMultipleTransactions(request);
+            var result = await _formService.TransactionsApproval(request);
 
             if (result.CompletedTransactionIds.Count == 0)
             {
@@ -102,6 +116,6 @@ namespace EngineeringLog.Controllers
             }
 
             return Ok(result);
-        }*/
+        }
     }
 }

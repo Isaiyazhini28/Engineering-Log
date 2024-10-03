@@ -6,15 +6,10 @@ namespace EngineeringLog.Services.IServices
 {
     public interface IDashboardService
     {
-        //Map
         Task<MapResponse> GetMapByPlantId(string plantId);
-        //Locations-Dashboard
         List<LocationResponse> GetLocations(int frequency);
-
-
-
-        //approverDashboard
-        Task<List<ApproverLocationResponse>> GetApproverDashboard(int frequency);
+        Task<List<AllLocationResponse>> GetAllLocations();
+        Task<List<ApproverLocationResponse>> GetApproverDashboard();
     }
 }
 
