@@ -33,7 +33,7 @@ export function useGetFieldsBasedOnLocationIdAPIQuery(data: any) {
     queryFn: () => GetFieldsBasedOnLocationIdAPI(data),
     staleTime: Infinity,
     gcTime: Infinity,
-    enabled: data.LocationId !== 0,
+    // enabled: data.locationId !== 0,
   });
 }
 

@@ -51,6 +51,9 @@ export const UpdateFieldvalueAPI = async (data: any) => {
 export const CreateTransaByLocationIdAPI = async (data: any) => {
   return await axiosEngineeringLog.post("/Form/CreateTransaByLocationId", data);
 };
+export const UpdateTransactionStatusAPI = async (data: any) => {
+  return await axiosEngineeringLog.put("/Form/UpdateTransactionStatus", data);
+};
 
 
 

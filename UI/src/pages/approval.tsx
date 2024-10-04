@@ -63,7 +63,7 @@ function Approval() {
                 <CardTitle>{module.name}</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center justify-center">
-                {/* Display the corresponding approval count */}
+              
                 <p className="text-center">
                   {approvalData ? approvalData.approval : "No Approval"}
                 </p>

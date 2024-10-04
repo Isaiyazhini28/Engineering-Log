@@ -26,6 +26,8 @@ export default function Layout() {
       setDashboardData(DashboardData);
     }
   }, [DashboardData]);
+  
+ 
 
   const setDashboardMonthlyData = useHtYardStore((state) => state.setHtYardMonthly);
   useEffect(() => {
@@ -33,8 +35,10 @@ export default function Layout() {
       setDashboardMonthlyData(DashboardMonthlyData);
     }
   }, [DashboardMonthlyData]);
-
   
+
+
+ 
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -46,6 +50,7 @@ export default function Layout() {
         <div className="flex-1 h-full w-full md:pt-1 md:pr-1 flex flex-col">
           <div className="flex-1  h-full w-full flex flex-col items-center p-0">
             <CardContent className="flex-1 w-full h-full p-0">
+           
               <Outlet />
               {false && <Loader />}
             </CardContent>
