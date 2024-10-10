@@ -13,12 +13,14 @@ namespace EngineeringLog.Services.IServices
         Task<string> UpdateTransactionValue(UpdateTransactionValueRequest request);
 
         //ViewPage
-        Task<ViewPageResponse> GetViewPage(int locationId);
+        //Task<ViewPageResponse> GetViewPage(int locationId);
         Task<ViewPageGridResponse> GetViewPageGrid(int pageNo, int pageSize, int locationId);
         Task<TransactionDetaiedResponse> GetTransactionDetails(int transactionId);
-        Task<List<TransactionLogResponse>> GetTransactionLogById(int transactionId); 
+        Task<List<TransactionLogResponse>> GetTransactionLogById(int transactionId);
+        Task<int> AddComment(ActivityLogCommentRequest request);
         //ApproverPage
         Task<TransaApproverResponse> TransactionsApproval(ApproverRequest request);
+        Task<ViewPageGridResponse> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize);
 
         //Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request);  
 

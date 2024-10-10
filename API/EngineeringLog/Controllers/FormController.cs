@@ -60,17 +60,6 @@ namespace EngineeringLog.Controllers
                 return Ok(result);
         }
 
-       /* [HttpGet("ViewPage")]
-        public async Task<IActionResult> GetViewPage(int locationId)
-        {
-            var result = await _formService.GetViewPage(locationId);
-            if (result == null)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }*/
-
         [HttpGet("GetViewPageGrid")]
         public async Task<IActionResult> GetViewPageGrid(int PageNo,int PageSize,int locationId)
         {
@@ -104,7 +93,15 @@ namespace EngineeringLog.Controllers
 
             return Ok(result);
         }
-       
+        [HttpPost("ActivityLogComment")]
+        public async Task<IActionResult> AddComment(ActivityLogCommentRequest request)
+        {
+
+                // Call the service to add the comment
+                var activityLogId = await _formService.AddComment(request);
+                return Ok(new { Message = "Comment added successfully.", ActivityLogId = activityLogId });
+        }
+
         [HttpPut("TransactionsApproval")]
         public async Task<IActionResult> TransactionsApproval( ApproverRequest request)
         {
@@ -116,6 +113,13 @@ namespace EngineeringLog.Controllers
             }
 
             return Ok(result);
+        }
+        [HttpGet("Report")]
+        public async Task<IActionResult> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize)
+        {
+                var result = await _formService.GetReportPage(locationId, startDate, endDate, pageNo, pageSize);
+                return Ok(result);
+            
         }
     }
 }

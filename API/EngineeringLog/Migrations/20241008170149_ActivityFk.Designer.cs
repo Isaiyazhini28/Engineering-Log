@@ -3,6 +3,7 @@ using System;
 using EngineeringLog.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EngineeringLog.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20241008170149_ActivityFk")]
+    partial class ActivityFk
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +54,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("ActivityLogs", (string)null);
+                    b.ToTable("ActivityLogs");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.FieldMaster", b =>
@@ -89,7 +92,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("FieldMasters", (string)null);
+                    b.ToTable("FieldMasters");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.LocationMaster", b =>
@@ -116,7 +119,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LocationMasters", (string)null);
+                    b.ToTable("LocationMasters");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.MapMaster", b =>
@@ -137,7 +140,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MapMasters", (string)null);
+                    b.ToTable("MapMasters");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.SubFieldMaster", b =>
@@ -172,7 +175,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("FieldId");
 
-                    b.ToTable("SubFieldMasters", (string)null);
+                    b.ToTable("SubFieldMasters");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.TransactionEntries", b =>
@@ -216,7 +219,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("TransactionEntries", (string)null);
+                    b.ToTable("TransactionEntries");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.TransactionValues", b =>
@@ -260,7 +263,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasIndex("TransactionId");
 
-                    b.ToTable("TransactionValues", (string)null);
+                    b.ToTable("TransactionValues");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.User", b =>
@@ -297,7 +300,7 @@ namespace EngineeringLog.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("EngineeringLog.Models.Entity.ActivityLog", b =>

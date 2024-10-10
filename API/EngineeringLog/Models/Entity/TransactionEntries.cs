@@ -8,7 +8,7 @@ namespace EngineeringLog.Models.Entity
         [Key]
         public int Id { get; set; }
         public string RefId { get; set; }
-        [ForeignKey("LocationMaster")]
+        [ForeignKey("LocationId")]
         public int LocationId { get; set; }
         public LocationMaster Location { get; set; }
         public DateTime CreatedDate { get; set; }
