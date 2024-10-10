@@ -2,14 +2,9 @@
 {
     public class ApproverRequest
     {
-        public List<TransactionsIdRequest> Transactions { get; set; }
+        public List<int> TransactionsId { get; set; }
+        public string Remark { get; set; } // Changed to PascalCase
         public bool IsApproved { get; set; }
         public string EmpId { get; set; }
-    }
-
-    public class TransactionsIdRequest
-    {
-        public int TransactionId { get; set; } 
-        public string Remarks { get; set; }
     }
 }

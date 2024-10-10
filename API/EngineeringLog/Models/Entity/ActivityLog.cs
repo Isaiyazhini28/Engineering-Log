@@ -14,8 +14,7 @@ namespace EngineeringLog.Models.Entity
         public string Action { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string ModifiedBy { get; set; }
-        public DateTime ModifiedAt { get; set; }
+        public ActivityType ActivityType { get; set; }
     }
 }
 

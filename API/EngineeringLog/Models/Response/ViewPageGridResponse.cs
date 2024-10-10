@@ -5,13 +5,15 @@ namespace EngineeringLog.Models.Response
     public class ViewPageGridResponse
     {
         public int Count { get; set; }
+        public int LocationId { get; set; }
+        public string LocationName { get; set; }
         public List<TransactionEntryResponse> Data { get; set; }
+
     }
     public class TransactionEntryResponse
     {
         public int TransactionId { get; set; }
         public string RefId { get; set; }
-        public int LocationId { get; set; }
         public DateTime CreatedDate { get; set; }
         public ApprovalStatus ApprovalStatus { get; set; }
         public string Remarks { get; set; }
