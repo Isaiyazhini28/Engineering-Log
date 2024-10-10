@@ -27,7 +27,8 @@ import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetFieldsBasedOnLocationIdAPIQuery } from "@/services/query";
 import { isValid } from "date-fns";
-import {useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { createHierarchicalArray } from "@/lib/utils";
 
 export function DynamicFormComp() {
   const navigate = useNavigate();
@@ -41,11 +42,13 @@ export function DynamicFormComp() {
   const { data: FieldsData } = useGetFieldsBasedOnLocationIdAPIQuery({
     locationId: s_LoactionId,
   });
- 
+
 
   const [dailyFieldsArray, setDailyFieldsArray] = useState([]);
   const [monthlyFieldsArray, setMonthlyFieldsArray] = useState([]);
-  const [MonthlyFieldsFlatArray, setMonthlyFieldsFlatArray] = useState([]);
+  const [dailyFieldsHierarchicalArray, setDailyFieldsHierarchicalArray] = useState<any>([]);
+  const [monthlyFieldsFlatArray, setMonthlyFieldsFlatArray] = useState([]);
+  const [monthlyFieldsHierarchicalArray, setMonthlyFieldsHierarchicalArray] = useState<any>([]);
   const dynamicSchema = createZodSchema(dailyFieldsArray);
   type DynamicFormType = z.infer<typeof dynamicSchema>;
 
@@ -72,9 +75,13 @@ export function DynamicFormComp() {
   useEffect(() => {
     if (FieldsData?.dailyFields?.length > 0) {
       setDailyFieldsArray(FieldsData.dailyFields);
+      let HiraricalData = createHierarchicalArray(FieldsData?.dailyFields)
+      setDailyFieldsHierarchicalArray(HiraricalData)
       // setDailyFieldsFlatArray(FieldsData.dailyFields.flatMap(flat));
     }
     if (FieldsData?.monthlyFields?.length > 0) {
+      let HiraricalData = createHierarchicalArray(FieldsData?.monthlyFields)
+      setMonthlyFieldsHierarchicalArray(HiraricalData)
       setMonthlyFieldsArray(FieldsData.monthlyFields);
     }
   }, [FieldsData]);
@@ -109,7 +116,7 @@ export function DynamicFormComp() {
     },
     onSuccess: () => {
       toast.success("Submited Successfully!");
-      queryClient.refetchQueries({queryKey:["Get Dashboard"]});
+      queryClient.refetchQueries({ queryKey: ["Get Dashboard"] });
       navigate("/")
     },
   });
@@ -153,39 +160,27 @@ export function DynamicFormComp() {
 
   const formLoad = (
     fieldData: any,
-    parentPath = "",
-    ischild = false,
-    filedId: number
+    index: number,
   ) => {
-    const currentPath = parentPath
-      ? `${parentPath}.${fieldData.fieldName}`
-      : fieldData.fieldName;
     return (
-      <div
-        className="grid grid-cols-1 gap-2 mr-5 ml-5"
-        key={fieldData.fieldName}
-      >
-        {fieldData.childFields && fieldData.childFields.length > 0 ? (
-          <div className="col-span-3 grid grid-cols-1 items-start mr-5 ml-5">
+      <div className="grid grid-cols-1 gap-2" key={fieldData.fieldName + index}>
+        {fieldData?.childFields?.length > 0 ? (
+          <div className="col-span-3 grid grid-cols-1 items-start">
             <div className="grid grid-cols-6 gap-2">
               <label className="w-full h-full flex items-center justify-start text-white">
-                {fieldData.subFieldId !== null
-                  ? fieldData.subFieldName
-                  : fieldData.fieldName}
+                {fieldData.fieldName}
               </label>
             </div>
             <div className="col-span-1 grid grid-cols-1 gap-2">
-              {fieldData.childFields.map((C_Item: any) =>
-                formLoad(C_Item, currentPath, true, fieldData.id)
+              {fieldData.childFields.map((C_Item: any, C_Index: number) =>
+                formLoad(C_Item, C_Index)
               )}
             </div>
           </div>
         ) : (
           <div className="col-span-3 grid grid-cols-6 gap-2 items-center">
             <label className="w-full h-full flex items-center justify-start text-white">
-              {fieldData.subFieldId !== null
-                ? fieldData.subFieldName
-                : fieldData.fieldName}
+              {fieldData.subFieldId !== null ? fieldData.subFieldName : fieldData.fieldName}
             </label>
             <div>
               <div className="w-full max-h-[40px] bg-indigo-950 text-white border-indigo-900 border rounded-[5px] p-2">
@@ -246,6 +241,7 @@ export function DynamicFormComp() {
     );
   };
 
+
   return (
     <div className="flex-1 flex flex-col h-full w-full bg-yellow-100">
       <div className="text-2xl font-bold text-center bg-yellow-100 h-12 mr-2 ml-2">
@@ -263,8 +259,8 @@ export function DynamicFormComp() {
               <div className="p-2">MTD AVERAGE</div>
               <div className="p-2">LAST MONTH AVERAGE</div>
             </div>
-            {dailyFieldsArray?.map((item) => formLoad(item))}
-            {monthlyFieldsArray?.map((item) => formLoad(item))}
+            {dailyFieldsHierarchicalArray?.map((item: any, index: number) => formLoad(item, index))}
+            {monthlyFieldsHierarchicalArray?.map((item: any, index: number) => formLoad(item, index))}
           </div>
 
           {/* </form> */}
