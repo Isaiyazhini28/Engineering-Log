@@ -58,7 +58,7 @@ type SubField = {
 export const createHierarchicalArray = (data: TransactionItem[]): HierarchicalField[] => {
   const hierarchicalData: HierarchicalField[] = [];
 
-  data.forEach((item) => {
+  data?.forEach((item) => {
     let parent = hierarchicalData.find((field) => field.fieldId === item.fieldId);
 
     if (!parent) {
