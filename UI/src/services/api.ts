@@ -57,6 +57,36 @@ export const UpdateTransactionStatusAPI = async (data: any) => {
 
 
 
+export const GetApproverDashboardAPI=async()=>{
+  const res=(await axiosEngineeringLog.get("Dashboard/ApproverDashboard")).data
+  return res
+};
+
+export const GetViewPageDashboardAPI=async()=>{
+  const res=(await axiosEngineeringLog.get("")).data
+  return res
+};
+
+
+export const GetViewPageDetailedAPI=async()=>{
+  const res=(await axiosEngineeringLog.get("/Form/GetViewPageDetailed?transactionId=80")).data
+  return res
+};
+export const GetViewPageGridAPI=async(params:any)=>{
+  const res=(await axiosEngineeringLog.get("/Form/GetViewPageGrid",{
+    params,
+    paramsSerializer:{indexes:true}
+  })).data
+  return res
+}
+
+
+
+
+
+
+
+
 
 
 // export const InsertDataApi = async (data:any,locationID:number)=> {

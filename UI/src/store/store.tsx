@@ -11,6 +11,8 @@ export interface HtYardInterface {
     setHtYard: (data: HtYardInterface[]) => void;
     HtYardMonthly: HtYardInterface[];
     setHtYardMonthly: (data: HtYardInterface[]) => void;
+    ViewGrid: HtYardInterface[];
+    setViewGrid: (data: HtYardInterface[]) => void;
   };
   
   export const useHtYardStore = create<HtYardtype>()(
@@ -23,6 +25,10 @@ export interface HtYardInterface {
         HtYardMonthly: [],
         setHtYardMonthly: (data: HtYardInterface[]) => {
           set(() => ({ HtYardMonthly: data }));
+        },
+        ViewGrid: [],
+        setViewGrid: (data: HtYardInterface[]) => {
+          set(() => ({ ViewGrid: data }));
         },
       }),
       {
@@ -49,24 +55,7 @@ export interface HtYardInterface {
       }
     )
   );
-//   type CreateTransaByLocationIdType={
-//     TransaByLocationId:number,
-//     setTransaByLocationId:(data:number)=>void;
-//   }
-//   export const useCreateTransaByLocationIdStore = create<CreateTransaByLocationIdType>()(
-//     persist(
-//       (set) => ({
-//         TransaByLocationId: 0,
-//         setTransaByLocationId: (data: number) => {
-//           set(() => ({ TransaByLocationId: data }));
-//         },
-//       }),
-//       {
-//         name: "Create TransaByLocation Id",
-//         storage: createJSONStorage(() => sessionStorage),
-//       }
-//     )
-//   );
+
   type selectedLocationAndTransactionIDType={
     LocationId:number,
     setLocationId:(data:number)=>void;
@@ -153,4 +142,32 @@ interface DynamicFormInsertInterface {
     )
   );
   
+  export interface ApprovalInterface { 
+    locationId:number,
+    locationName:string,
+    sequenceId:number,
+    pendingCount:string,
+  }
+
+type Approvaltype = {
+  Approval: ApprovalInterface[];
+  setApproval: (data: ApprovalInterface[]) => void;
   
+};
+
+export const useApprovalStore = create<Approvaltype>()(
+  persist(
+    (set) => ({
+      Approval: [],
+      setApproval: (data: ApprovalInterface[]) => {
+        set(() => ({ Approval: data }));
+      },
+      
+    }),
+    {
+      name: "Approval",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);
+
