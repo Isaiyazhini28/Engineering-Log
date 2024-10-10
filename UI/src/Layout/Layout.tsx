@@ -4,8 +4,8 @@ import { CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Loader } from "@/components/loader";
-import { useGetDashboardMonthlyQuery, useGetDashboardQuery } from "@/services/query";
-import { useHtYardStore } from "@/store/store";
+import { useGetApproverDashboardQuery, useGetDashboardMonthlyQuery, useGetDashboardQuery } from "@/services/query";
+import { useApprovalStore, useHtYardStore } from "@/store/store";
 
 export const KEY_USER_SESSIONS = import.meta.env.VITE_SSO_KEY_NAME;
 export const KEY_USER_DOMAIN = import.meta.env.VITE_SSO_DOMAIN;
@@ -15,7 +15,7 @@ export default function Layout() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: DashboardData } = useGetDashboardQuery();
   const { data: DashboardMonthlyData } = useGetDashboardMonthlyQuery();
-
+  const { data: Approval } = useGetApproverDashboardQuery();
 
   const onSearchBoxOpen = (data: boolean) => {
     setIsOpen(data);
@@ -35,10 +35,15 @@ export default function Layout() {
       setDashboardMonthlyData(DashboardMonthlyData);
     }
   }, [DashboardMonthlyData]);
+
+  const setApproval = useApprovalStore((state) => state.setApproval);
+  useEffect(() => {
+    if (Approval?.length > 0) {
+      setApproval(Approval);
+    }
+  }, [Approval]);
+
   
-
-
- 
 
   return (
     <div className="flex flex-col h-screen bg-white">

@@ -10,7 +10,7 @@ import {
 import { useLocation } from "react-router-dom";
 import SideNavBarButton from "./SideNavBarButton";
 import { PathList } from "@/router/router";
-
+import { LayoutDashboard } from 'lucide-react';
 type SideNavBarType = {
   MenuClose?: (data: boolean) => void;
 };
@@ -54,6 +54,11 @@ export function SideNavBar({ MenuClose }: SideNavBarType) {
       Icon: FolderKanban,
       Name: "View",
       Link: PathList.View,
+    },
+    {
+      Icon: LayoutDashboard,
+      Name: "ViewDashboard",
+      Link: PathList.ViewDashboard,
     },
   ];
 

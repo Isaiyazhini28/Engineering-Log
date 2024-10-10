@@ -34,9 +34,6 @@ import {
 } from "@/components/ui/table";
 import { HT_Yard_Array } from "@/lib/ht-yard-array";
 
-
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-
 import {
   Card,
   CardContent,
@@ -46,7 +43,10 @@ import {
 } from "@/components/ui/card";
 
 import { toast } from "react-toastify";
-
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
+import { useGetViewPageGridQuery } from "@/services/query";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 export type ArrayType = {
   fieldId: number;
@@ -61,13 +61,21 @@ export type ArrayType = {
 
 const data = HT_Yard_Array.flatMap((field) => {
   if (field.child) {
-    return field.child.map((child: { fieldId: any; name: any; value: any; type: any; SequenceId: any; }) => ({
-      id: child.fieldId,
-      name: child.name,
-      value: child.value,
-      type: child.type,
-      sequence: child.SequenceId,
-    }));
+    return field.child.map(
+      (child: {
+        fieldId: any;
+        name: any;
+        value: any;
+        type: any;
+        SequenceId: any;
+      }) => ({
+        id: child.fieldId,
+        name: child.name,
+        value: child.value,
+        type: child.type,
+        sequence: child.SequenceId,
+      })
+    );
   } else {
     return [
       {
@@ -82,32 +90,13 @@ const data = HT_Yard_Array.flatMap((field) => {
 });
 
 export const columns: ColumnDef<any>[] = [
-  {
-    id: 'serial',
-    header: 'Header',
-    cell: ({ row }) => {
-
-      const cellLabels = ['Previous Reading', 'Current Reading', 'Difference', 'MTD Avg'];
-
-
-      const cellLabel = cellLabels[row.index] || '';
-
-      return <div className="text-white">{cellLabel}</div>;
-    },
-    enableSorting: false,
-    enableHiding: false,
-    width: 150,
-  },
-
   ...HT_Yard_Array.flatMap((field) => {
     if (field.child) {
       return field.child.map((child: { name: string }) => ({
         accessorKey: child.name.toLowerCase().replace(/ /g, "_"),
         header: child.name,
         cell: ({ row }) => (
-          <div>
-            {row.getValue(child.name.toLowerCase().replace(/ /g, "_"))}
-          </div>
+          <div>{row.getValue(child.name.toLowerCase().replace(/ /g, "_"))}</div>
         ),
       }));
     } else {
@@ -124,13 +113,19 @@ export const columns: ColumnDef<any>[] = [
       ];
     }
   }),
-  
 ];
 
-export function ReadingView() {
+export function ViewGrid() {
+    const navigate = useNavigate(); // Initialize useNavigate
   const [dailyFieldsArray, setDailyFieldsArray] = React.useState([]);
   const [monthlyFieldsArray, setMonthlyFieldsArray] = React.useState([]);
 
+  const {data:GridData}=useGetViewPageGridQuery({
+    locationId:1,
+    PageSize:10,
+    PageNo:1
+  })
+console.log(GridData,"GridData")
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -152,22 +147,24 @@ export function ReadingView() {
     },
   });
 
-
-
-  const handleLogSubmit = () => {
-    console.log("Log comment submitted:", logComment);
-    setLogComment("");
-  };
-
   return (
-    <div className="h-full w-full p-2 flex flex-col overflow-auto">
-      <div className="flex-1 flex-row h-full">
+    <div className="h-full w-full p-2 flex flex-col overflow-auto gap-3 bg-yellow-100">
+      <div className="w-full h-20 ">
+      <Button onClick={() => navigate("/viewdashboard")}>Back</Button>
+        <label className="text-indigo-950 font-bold flex justify-center  ">
+          WB MIXER RH2
+        </label>
+        <div className="flex justify-start font-bold">Updated fields :</div>
+      </div>
+      <hr style={{ border: 'none', borderTop: '1px solid black' }} />
+
+      <div className="flex-1 flex-row h-full ">
         <div className="h-full flex flex-row gap-1">
           <div className="flex-1">
             <div className="flex flex-col h-full">
               <div className="flex-1 overflow-y-auto relative h-full">
                 <div className="absolute w-full h-full border-none rounded-sm md:border-2">
-                  <ScrollArea className="h-[100%] relative w-full rounded-sm border-none bg-indigo-950" >
+                  <ScrollArea className="h-[100%] relative w-full rounded-sm border-none bg-indigo-950">
                     <Table>
                       <TableHeader className="bg-yellow-400 text-black ">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -176,13 +173,16 @@ export function ReadingView() {
                             className="bg-yellow-400 hover:bg-yellow-400"
                           >
                             {headerGroup.headers.map((header) => (
-                              <TableHead key={header.id} className="bg-yellow-400 hover:bg-yellow-400 text-black">
+                              <TableHead
+                                key={header.id}
+                                className="bg-yellow-400 hover:bg-yellow-400 text-black"
+                              >
                                 {header.isPlaceholder
                                   ? null
                                   : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                  )}
+                                      header.column.columnDef.header,
+                                      header.getContext()
+                                    )}
                               </TableHead>
                             ))}
                           </TableRow>
@@ -218,60 +218,27 @@ export function ReadingView() {
                   </ScrollArea>
                 </div>
               </div>
-              <div className="h-48 overflow-auto">
-                <div className="flex flex-col">
-                  <label className="font-semibold">Attachment</label>
-                  
-                  
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="w-80">
-            <div className="h-full w-full">
-              <div className="flex h-full w-full flex-col">
-                <div className="h-12 bg-yellow-400 text-black flex rounded-sm justify-center items-center">ACTIVITY LOG</div>
-                <div className="flex-1 mr-1 ml-1 p-4 overflow-auto">
-                  {[
-                    { label: "Transaction ID", value: "" },
-                    { label: "Created By", value: "" },
-                    { label: "Created On", value: "" },
-                    { label: "Revised On", value: "" },
-                    { label: "Revised By", value: "" },
-                    { label: "Updated fields", value: "" },
-                    { label: "Revised On", value: "" },
-                    { label: "Revised By", value: "" },
-                    { label: "Updated fields", value: "" },
-                  ].map((field, index) => (
-                    <div key={index} className="mb-2">
-                      <label className="block text-sm font-medium text-gray-700">{field.label}</label>
-                      <Input value={field.value} onChange={() => { }} />
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mr-2 ml-2 mb-4">
-                  <div className="relative flex items-center">
-                    <textarea
-                      value={logComment}
-                      onChange={(e) => setLogComment(e.target.value)}
-                      placeholder="Enter your comment here..."
-                      className="w-full h-12 p-2 border rounded-md resize-none pr-14"
-                    />
-                    <Button
-                      variant="outline"
-                      className="absolute right-0 bg-green-600 text-white border-green-400 hover:bg-green-400 h-8 p-2 mr-2"
-                      onClick={handleLogSubmit}
-                    >
-                      Send
-                    </Button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
+      <Pagination className="flex justify-end">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext href="#" />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
     </div>
   );
 }
+export default ViewGrid;
