@@ -1,4 +1,5 @@
-﻿using EngineeringLog.Models.Request;
+﻿using EngineeringLog.Models.Entity;
+using EngineeringLog.Models.Request;
 using EngineeringLog.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -115,9 +116,9 @@ namespace EngineeringLog.Controllers
             return Ok(result);
         }
         [HttpGet("Report")]
-        public async Task<IActionResult> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize)
+        public async Task<IActionResult> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize, int? status = null)
         {
-                var result = await _formService.GetReportPage(locationId, startDate, endDate, pageNo, pageSize);
+                var result = await _formService.GetReportPage(locationId, startDate, endDate, pageNo, pageSize,status);
                 return Ok(result);
             
         }

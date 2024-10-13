@@ -1,4 +1,5 @@
-﻿using EngineeringLog.Models.Request;
+﻿using EngineeringLog.Models.Entity;
+using EngineeringLog.Models.Request;
 using EngineeringLog.Models.Response;
 
 namespace EngineeringLog.Services.IServices
@@ -20,7 +21,7 @@ namespace EngineeringLog.Services.IServices
         Task<int> AddComment(ActivityLogCommentRequest request);
         //ApproverPage
         Task<TransaApproverResponse> TransactionsApproval(ApproverRequest request);
-        Task<ViewPageGridResponse> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize);
+        Task<ViewPageGridResponse> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize, int? status = null);
 
         //Task<List<TransactionEntryResponse>> UpdateTransaction(TransactionUpdateRequest request);  
 
