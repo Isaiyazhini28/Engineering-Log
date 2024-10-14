@@ -15,6 +15,8 @@ namespace EngineeringLog.Models.Response
         public int TransactionId { get; set; }
         public string RefId { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public string? RevisedBy { get; set; }
         public ApprovalStatus ApprovalStatus { get; set; }
         public string Remarks { get; set; }
         public List<ViewPageTransactionValueResponse> TransactionValues { get; set; }
