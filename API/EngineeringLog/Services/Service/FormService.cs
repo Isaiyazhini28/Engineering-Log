@@ -488,6 +488,8 @@ namespace EngineeringLog.Services.Service
                     TransactionId = te.Id,
                     RefId = te.RefId,
                     CreatedDate = te.CreatedDate,
+                    CreatedBy=te.CreatedBy,
+                    RevisedBy=te.RevisedBy,
                     ApprovalStatus = te.ApprovalStatus,
                     Remarks = te.Remarks,
                     TransactionValues = _dbContext.TransactionValues
