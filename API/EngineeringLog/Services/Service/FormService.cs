@@ -3,8 +3,10 @@ using EngineeringLog.Models.Entity;
 using EngineeringLog.Models.Request;
 using EngineeringLog.Models.Response;
 using EngineeringLog.Services.IServices;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+
 
 namespace EngineeringLog.Services.Service
 {
@@ -126,6 +128,8 @@ namespace EngineeringLog.Services.Service
                     Frequency = tv.Field.Frequency,
                     Type= tv.Field.Type
                 })
+                 .OrderBy(tv => tv.FieldSequenceId) 
+                .ThenBy(tv => tv.SubFieldSequenceId)    
                 .ToListAsync();
             foreach (var field in transactionValues.GroupBy(tv => tv.FieldId))
             {
@@ -151,13 +155,13 @@ namespace EngineeringLog.Services.Service
                 else
                 {
                     currentField.PreviousReading = previousReadings
-                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == null)
                         .Select(x => x.LastReading).FirstOrDefault() ?? string.Empty;
                     currentField.MtdAvg = mtdAverages
-                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == null)
                         .Select(x => x.MtdAverage).FirstOrDefault();
                     currentField.PreviousMonthAvg = previousMonthAverages
-                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == 0)
+                        .Where(x => x.FieldId == currentField.FieldId && x.SubFieldId == null)
                         .Select(x => x.PreviousMonthAvg).FirstOrDefault();
                 }
             }
@@ -475,7 +479,8 @@ namespace EngineeringLog.Services.Service
         {
 
             var totalCount = await _dbContext.TransactionEntries.Where(te => te.LocationId == locationId).CountAsync();
-            var transactionEntries = await _dbContext.TransactionEntries.Where(te => te.LocationId == locationId).OrderByDescending(te => te.CreatedDate)
+            var transactionEntries = await _dbContext.TransactionEntries.Where(te => te.LocationId == locationId).OrderBy(te => te.ApprovalStatus) 
+        .ThenByDescending(te => te.CreatedDate)
                 .Skip((pageNo - 1) * pageSize)
                 .Take(pageSize)
                 .Select(te => new TransactionEntryResponse
@@ -497,7 +502,8 @@ namespace EngineeringLog.Services.Service
                             SubFieldSequenceId = tv.SubFieldId != null ? tv.SubField.SequenceId : null,
                             SubFieldName = tv.SubField != null ? tv.SubField.Name : null,
                             Value = tv.Value
-                        }).ToList()
+                        }).OrderBy(tv => tv.FieldSequenceId) 
+                          .ThenBy(tv => tv.SubFieldSequenceId).ToList()
                 }).ToListAsync();
             return new ViewPageGridResponse
             {
@@ -558,10 +564,11 @@ namespace EngineeringLog.Services.Service
 
         private async Task<List<ViewPagePreReaResponse>> PreviousReadings(int locationId, DateTime transactionDate)
         {
-            
+
             var lastTransaction = await _dbContext.TransactionEntries
-                .Where(te => te.LocationId == locationId && te.CreatedDate < transactionDate)
+                .Where(te => te.LocationId == locationId && te.CreatedDate <= transactionDate)
                 .OrderByDescending(te => te.CreatedDate)
+                .Skip(1)
                 .Select(te => te.Id)
                 .FirstOrDefaultAsync();
 
@@ -576,8 +583,12 @@ namespace EngineeringLog.Services.Service
                 {
                     FieldId = g.FieldId,
                     SubFieldId = g.SubFieldId,
-                    LastReading = g.Value
+                    LastReading = g.Value != null ? g.Value.ToString() : ""
                 }).ToListAsync();
+            foreach (var reading in lastReadings)
+            {
+                Console.WriteLine($"FieldId: {reading.FieldId}, SubFieldId: {reading.SubFieldId}, LastReading: {reading.LastReading}");
+            }
 
             return lastReadings;
         }
@@ -663,16 +674,20 @@ namespace EngineeringLog.Services.Service
             };
         }
 
-        public async Task<ViewPageGridResponse> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize)
+        public async Task<ViewPageGridResponse> GetReportPage(int locationId, DateTime startDate, DateTime endDate, int pageNo, int pageSize, int? status = null)
         {
             startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
             endDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
-            var totalCount = await _dbContext.TransactionEntries
-                .Where(te => te.LocationId == locationId && te.CreatedDate >= startDate && te.CreatedDate <= endDate)
-                .CountAsync();
-            var transactionEntries = await _dbContext.TransactionEntries
-                .Where(te => te.LocationId == locationId && te.CreatedDate >= startDate && te.CreatedDate <= endDate)
-                .OrderByDescending(te => te.CreatedDate)
+            var query = _dbContext.TransactionEntries
+                .Where(te => te.LocationId == locationId && te.CreatedDate >= startDate && te.CreatedDate <= endDate);
+            if (status.HasValue)
+            {
+                var approvalStatus = (ApprovalStatus)status.Value;
+                query = query.Where(te => te.ApprovalStatus == approvalStatus);
+            }
+            var totalCount = await query.CountAsync();
+            var transactionEntries = await query
+                .OrderBy(te => te.CreatedDate)
                 .Skip((pageNo - 1) * pageSize)
                 .Take(pageSize)
                 .Select(te => new TransactionEntryResponse
@@ -690,14 +705,12 @@ namespace EngineeringLog.Services.Service
                             FieldId = tv.FieldId,
                             FieldSequenceId = tv.Field.SequenceId,
                             FieldName = tv.Field.Name,
-                            SubFieldId = tv.SubField.Id,
-                            SubFieldSequenceId = tv.SubFieldId != null ? tv.SubField.SequenceId : null,
+                            SubFieldId = tv.SubField != null ? tv.SubField.Id : (int?)null, 
+                            SubFieldSequenceId = tv.SubFieldId != null ? tv.SubField.SequenceId : (int?)null,
                             SubFieldName = tv.SubField != null ? tv.SubField.Name : null,
                             Value = tv.Value
                         }).ToList()
                 }).ToListAsync();
-
-            // Create and return the response
             return new ViewPageGridResponse
             {
                 Count = totalCount,
