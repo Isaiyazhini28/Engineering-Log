@@ -11,8 +11,8 @@ export interface HtYardInterface {
     setHtYard: (data: HtYardInterface[]) => void;
     HtYardMonthly: HtYardInterface[];
     setHtYardMonthly: (data: HtYardInterface[]) => void;
-    ViewGrid: HtYardInterface[];
-    setViewGrid: (data: HtYardInterface[]) => void;
+    ViewDash: HtYardInterface[];
+    setViewDash: (data: HtYardInterface[]) => void;
   };
   
   export const useHtYardStore = create<HtYardtype>()(
@@ -26,9 +26,9 @@ export interface HtYardInterface {
         setHtYardMonthly: (data: HtYardInterface[]) => {
           set(() => ({ HtYardMonthly: data }));
         },
-        ViewGrid: [],
-        setViewGrid: (data: HtYardInterface[]) => {
-          set(() => ({ ViewGrid: data }));
+        ViewDash: [],
+        setViewDash: (data: HtYardInterface[]) => {
+          set(() => ({ ViewDash: data }));
         },
       }),
       {
@@ -55,6 +55,7 @@ export interface HtYardInterface {
       }
     )
   );
+//  getfieldbylocationid
 
   type selectedLocationAndTransactionIDType={
     LocationId:number,
@@ -80,7 +81,7 @@ export interface HtYardInterface {
       }
     )
   );
-
+// fieldstore
   export interface FieldsInterface{
     id:number,
     name:string,
@@ -171,3 +172,66 @@ export const useApprovalStore = create<Approvaltype>()(
   )
 );
 
+// table pagination
+
+type TableFiltertype = {
+ 
+  pageSize: number;
+  page: number;
+  locationId: number;
+  totalPage: number;
+  
+  setPageSize: (pageSize: number) => void;
+  setPage: (page: number) => void;
+  setlocationId: (itsme: number) => void;
+  setTotalPage: (totalPage: number) => void;
+  
+};
+ 
+export const useTableFilterStore = create<TableFiltertype>()(
+  persist(
+    (set) => ({
+     
+    
+      pageSize: 10,
+      page: 1,
+      locationId: 0,
+      totalPage: 0,
+      
+      
+      setPageSize: (pageSize) => set({ pageSize }),
+      setPage: (page) => set({ page }),
+      setlocationId: (locationId) => set({ locationId }),
+      setTotalPage: (totalPage) => set({ totalPage }),
+      
+    })
+    ,
+    {
+      name: "Table Filter Data",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);
+
+// viewpagedetailed
+
+type viewpagedetailedType={
+  
+  transactionId:number,
+  setTransactionId:(data:number)=>void;
+}
+export const useViewpageDetailedStore = create<viewpagedetailedType>()(
+  persist(
+    (set) => ({
+     
+      transactionId:0,
+      setTransactionId: (data: number) => {
+        set(() => ({ transactionId: data }));
+      },
+    }),
+    {
+      name: "view page detailed",
+      storage: createJSONStorage(() => sessionStorage),
+    }
+  )
+);

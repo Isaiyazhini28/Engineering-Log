@@ -63,15 +63,21 @@ export const GetApproverDashboardAPI=async()=>{
 };
 
 export const GetViewPageDashboardAPI=async()=>{
-  const res=(await axiosEngineeringLog.get("")).data
+  const res=(await axiosEngineeringLog.get("/Dashboard/ViewPageDashboard")).data
   return res
 };
 
 
-export const GetViewPageDetailedAPI=async()=>{
-  const res=(await axiosEngineeringLog.get("/Form/GetViewPageDetailed?transactionId=80")).data
+
+
+export const GetViewPageDetailedAPI=async(params:any)=>{
+  const res=(await axiosEngineeringLog.get("/Form/GetViewPageDetailed",{
+    params,
+    paramsSerializer:{indexes:true}
+  })).data
   return res
-};
+}
+
 export const GetViewPageGridAPI=async(params:any)=>{
   const res=(await axiosEngineeringLog.get("/Form/GetViewPageGrid",{
     params,
