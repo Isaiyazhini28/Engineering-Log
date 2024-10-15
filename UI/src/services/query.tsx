@@ -71,10 +71,10 @@ export function useGetViewPageGridQuery(data:any) {
   });
 }
 
-export function useGetViewPageDetailedQuery() {
+export function useGetViewPageDetailedQuery(data:any) {
   return useQuery({
-    queryKey: ["Get ViewPageDetailed"],
-    queryFn: () => GetViewPageDetailedAPI(),
+    queryKey: ["Get ViewPageDetailed",data.transactionId],
+    queryFn: () => GetViewPageDetailedAPI(data),
     staleTime: Infinity,
     gcTime: Infinity,
   });

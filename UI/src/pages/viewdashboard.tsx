@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useApprovalStore, useHtYardStore } from "@/store/store";
+import { useApprovalStore, useHtYardStore, useTableFilterStore } from "@/store/store";
 import { useNavigate } from "react-router-dom";
 
 function ViewDashboard() {
@@ -12,13 +12,14 @@ function ViewDashboard() {
   const DashboardMonthlyData = useHtYardStore((state) => state.HtYardMonthly);
   const Approval = useApprovalStore((state) => state.Approval);
   const navigate = useNavigate();
-
+  const TableFilter=useTableFilterStore((state)=>state)
 
   
-  const handleCardClick = (title: string) => {
-    if (title === "WB MIXER RH(2)") {
+  const handleCardClick = (data:any) => {
+    TableFilter.setlocationId(data.locationId)
+    
       navigate("/viewgrid");
-    }
+  
   };
 
 
@@ -38,7 +39,7 @@ function ViewDashboard() {
             <Card
               key={index}
               className="w-full bg-yellow-400 cursor-pointer"
-              onClick={() => handleCardClick(module.locationName)}
+              onClick={() => handleCardClick(module)}
             >
               <CardHeader className="flex items-center justify-center text-blue-950">
                 <CardTitle>{module.locationName}</CardTitle>

@@ -47,6 +47,7 @@ import {
 
 import { HT_Yard_Array } from "@/lib/ht-yard-array";
 import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "react-router-dom";
 
 // Define the type
 export type ArrayType = {
@@ -151,6 +152,7 @@ export const columns: ColumnDef<any>[] = [
 ];
 
 export function ApprovalTable() {
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -190,8 +192,18 @@ export function ApprovalTable() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-yellow-100">
+    <div className="w-full h-full flex flex-col  bg-yellow-100">
       <div className="w-full h-screen flex flex-col">
+      <div className="w-full h-20 mt-3">
+      <Button onClick={() => navigate("/approval")}>Back</Button>
+        <label className="text-indigo-950 font-bold flex justify-center  ">
+          WB MIXER RH2
+        </label>
+        <div className="gap-2">
+        <div className="flex justify-start font-bold">Approval Pending :</div>
+      </div>
+      <hr style={{ border: 'none', borderTop: '1px solid black' }} />
+      </div>
         <div className="flex items-center py-4">
           <Input
             placeholder="Filter fields..."

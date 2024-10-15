@@ -47,6 +47,8 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
 import { useGetViewPageGridQuery } from "@/services/query";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import ViewGridPagination from "./view-grid-pagination";
+import { useTableFilterStore, useViewpageDetailedStore } from "@/store/store";
 
 export type ArrayType = {
   fieldId: number;
@@ -119,11 +121,11 @@ export function ViewGrid() {
     const navigate = useNavigate(); // Initialize useNavigate
   const [dailyFieldsArray, setDailyFieldsArray] = React.useState([]);
   const [monthlyFieldsArray, setMonthlyFieldsArray] = React.useState([]);
-
+  const TableFilter=useTableFilterStore((state)=>state)
   const {data:GridData}=useGetViewPageGridQuery({
-    locationId:1,
-    PageSize:10,
-    PageNo:1
+    locationId:TableFilter.locationId,
+    PageSize:TableFilter.pageSize,
+    PageNo:TableFilter.page
   })
 console.log(GridData,"GridData")
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -137,7 +139,7 @@ console.log(GridData,"GridData")
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -146,6 +148,22 @@ console.log(GridData,"GridData")
       columnVisibility,
     },
   });
+ const viewpagedetailed=useViewpageDetailedStore((state)=>state)
+ 
+
+
+  React.useEffect(() => {
+    if (GridData) {
+      const totalPage = Math.ceil(GridData.count / TableFilter.pageSize);
+      TableFilter.setTotalPage(totalPage);
+    }
+  }, [GridData]);
+
+  const onrowclick=(rowdata:any)=>{
+    alert(rowdata.transactionId)
+    viewpagedetailed.setTransactionId(rowdata.transactionId)
+    navigate("/view");
+  }
 
   return (
     <div className="h-full w-full p-2 flex flex-col overflow-auto gap-3 bg-yellow-100">
@@ -167,51 +185,27 @@ console.log(GridData,"GridData")
                   <ScrollArea className="h-[100%] relative w-full rounded-sm border-none bg-indigo-950">
                     <Table>
                       <TableHeader className="bg-yellow-400 text-black ">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                          <TableRow
-                            key={headerGroup.id}
-                            className="bg-yellow-400 hover:bg-yellow-400"
-                          >
-                            {headerGroup.headers.map((header) => (
-                              <TableHead
-                                key={header.id}
-                                className="bg-yellow-400 hover:bg-yellow-400 text-black"
-                              >
-                                {header.isPlaceholder
-                                  ? null
-                                  : flexRender(
-                                      header.column.columnDef.header,
-                                      header.getContext()
-                                    )}
-                              </TableHead>
-                            ))}
-                          </TableRow>
-                        ))}
+                       
+                          <TableRow>
+                          <TableHead className="w-[100px] ">transactionId</TableHead>
+                          <TableHead>refId</TableHead>
+                          <TableHead>createdDate</TableHead>
+                          <TableHead>approvalStatus</TableHead>
+                          <TableHead className="text-right">remarks</TableHead>
+                        </TableRow>
+                       
                       </TableHeader>
                       <TableBody className="pb-48">
-                        {table.getRowModel().rows?.length ? (
-                          table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id}>
-                              {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
-                                  )}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell
-                              colSpan={columns.length}
-                              className="h-24 text-center text-black"
-                            >
-                              No results.
-                            </TableCell>
-                          </TableRow>
-                        )}
+                      {GridData?.data?.map((rows:any,index:number) => (
+          <TableRow onClick={()=>onrowclick(rows)} key={index}>
+          
+            <TableCell className="font-medium text-white">{rows.transactionId}</TableCell>
+            <TableCell className="text-white">{rows.refId}</TableCell>
+            <TableCell className="text-white">{rows.createdDate}</TableCell>
+            <TableCell className="text-white">{rows.approvalStatus}</TableCell>
+            <TableCell className="text-right text-white">{rows.remarks}</TableCell>
+          </TableRow>
+        ))}
                       </TableBody>
                     </Table>
                     <ScrollBar orientation="horizontal" />
@@ -222,22 +216,7 @@ console.log(GridData,"GridData")
           </div>
         </div>
       </div>
-      <Pagination className="flex justify-end">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+     <ViewGridPagination count={GridData?.count}/>
     </div>
   );
 }
