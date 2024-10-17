@@ -17,17 +17,21 @@ import { useEffect, useState } from "react";
 import {
   useGetDashboardQuery,
   useGetFieldsBasedOnLocationIdAPIQuery,
+  useGetMapQuery,
 } from "@/services/query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateTransaByLocationIdAPI } from "@/services/api";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [selectedEmployeeId, setselectedEmployeeId] = useState(0);
   const [selectedLoactionId, setSelectedLocationId] = useState(0);
   const UserDetails = JSON.parse(sessionStorage.getItem("UserDetails"));
+  const { data: MapData } = useGetMapQuery({ plantId: "P1000" })
   const SelectedL_T_IDStore = useSelectedLocationAndTransactionIDStore(
     (state) => state
   );
@@ -61,19 +65,22 @@ function Dashboard() {
         employeeId: UserDetails.id,
       });
       navigate("/dynamicformcomp");
-      
+
     }
   };
 
+  console.log(MapData, "MapData")
+
   return (
     <div className="bg-yellow-100 h-full w-full p-2 flex flex-col overflow-auto">
-      <Tabs defaultValue="Daily" className="w-full">
-        <div className="h-10 flex justify-start">
-          <div className="flex justify-center items-center gap-1">
-            <Card className="bg-gray-100 fixed">
-              <TabsList className="fixed left-0 top-12 ml-20">
-                <TabsTrigger value="Daily">Daily</TabsTrigger>
-                <TabsTrigger value="Monthly">Monthly</TabsTrigger>
+      <Tabs defaultValue="Daily" className="w-full h-full">
+        <div className="h-10 flex justify-between w-full">
+          <div className="flex justify-center items-center gap-1 absolute bg-white">
+            <Card className="bg-gray-100 ">
+              <TabsList className="w-72 flex justify-center items-center">
+                <TabsTrigger className="w-24" value="Daily">Daily</TabsTrigger>
+                <TabsTrigger className="w-24" value="Monthly">Monthly</TabsTrigger>
+                <TabsTrigger className="w-24" value="Map">Map</TabsTrigger>
               </TabsList>
             </Card>
           </div>
@@ -91,14 +98,13 @@ function Dashboard() {
                   <CardTitle>{module.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center">
-                  
+
                 </CardContent>
                 <CardFooter className="flex flex-col items-center justify-center">
-               
+
                   <p
-                    className={`text-center ${
-                      module.status ? "text-green-500" : "text-red-500"
-                    }`}
+                    className={`text-center ${module.status ? "text-green-500" : "text-red-500"
+                      }`}
                   >
                     {module.status ? "Completed" : "Pending"}
                   </p>
@@ -120,11 +126,19 @@ function Dashboard() {
                   <CardTitle>{module.name}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center justify-center">
-               
+
                 </CardContent>
                 <CardFooter className="flex flex-col items-center justify-center"></CardFooter>
               </Card>
             ))}
+          </div>
+        </TabsContent>
+        <TabsContent className="h-[92%] w-full" value="Map">
+          <div className="h-full w-full bg-green-400 relative">
+            <ScrollArea className="absolute h-full w-full bg-red-400">
+              <div dangerouslySetInnerHTML={{ __html: MapData?.result?.html }} />
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
         </TabsContent>
       </Tabs>

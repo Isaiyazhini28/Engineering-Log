@@ -8,6 +8,7 @@ import {
   GetDashboardAPI,
   GetDashboardMonthlyAPI,
   GetFieldsBasedOnLocationIdAPI,
+  getMap_API,
   GetViewPageDashboardAPI,
   GetViewPageDetailedAPI,
   GetViewPageGridAPI,
@@ -75,6 +76,15 @@ export function useGetViewPageDetailedQuery(data:any) {
   return useQuery({
     queryKey: ["Get ViewPageDetailed",data.transactionId],
     queryFn: () => GetViewPageDetailedAPI(data),
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+}
+
+export function useGetMapQuery(data:any) {
+  return useQuery({
+    queryKey: ["Get Map",data.plantId],
+    queryFn: () => getMap_API(data),
     staleTime: Infinity,
     gcTime: Infinity,
   });
