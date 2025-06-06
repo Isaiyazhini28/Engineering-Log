@@ -48,6 +48,11 @@ import {
 import { HT_Yard_Array } from "@/lib/ht-yard-array";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
+import { useGetApprovalGridQuery } from "@/services/query";
+import { useTableFilterStore, useViewpageDetailedStore } from "@/store/store";
+import { ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import ViewGridPagination from "./view-grid-pagination";
 
 // Define the type
 export type ArrayType = {
@@ -153,6 +158,15 @@ export const columns: ColumnDef<any>[] = [
 
 export function ApprovalTable() {
   const navigate = useNavigate();
+  const [dailyFieldsArray, setDailyFieldsArray] = React.useState([]);
+  const [monthlyFieldsArray, setMonthlyFieldsArray] = React.useState([]);
+  const TableFilter=useTableFilterStore((state)=>state)
+  const {data:ApprovalGridData}=useGetApprovalGridQuery({
+    locationId:TableFilter.locationId,
+    PageSize:TableFilter.pageSize,
+    PageNo:TableFilter.page
+  })
+console.log(ApprovalGridData,"ApprovalGridData")
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -168,7 +182,7 @@ export function ApprovalTable() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -180,7 +194,24 @@ export function ApprovalTable() {
       rowSelection,
     },
   });
+////////////////////////////////////////////
+  const viewpagedetailed=useViewpageDetailedStore((state)=>state)
+ 
 
+
+  React.useEffect(() => {
+    if (ApprovalGridData) {
+      const totalPage = Math.ceil(ApprovalGridData.count / TableFilter.pageSize);
+      TableFilter.setTotalPage(totalPage);
+    }
+  }, [ApprovalGridData]);
+
+  const onrowclick=(rowdata:any)=>{
+    alert(rowdata.transactionId)
+    viewpagedetailed.setTransactionId(rowdata.transactionId)
+    navigate("/approvaldetailed");
+  }
+////////////////////////////////
   const handleApprove = () => {
     setActionType("Approve");
     console.log("Approved rows:", rowSelection);
@@ -204,93 +235,55 @@ export function ApprovalTable() {
       </div>
       <hr style={{ border: 'none', borderTop: '1px solid black' }} />
       </div>
-        <div className="flex items-center py-4">
-          <Input
-            placeholder="Filter fields..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm bg-gray-400 placeholder-white"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="ml-auto bg-gray-400 text-white"
-              >
-                Columns <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-gray-400 text-white">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize bg-gray-400 text-white"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+      <br></br>
+        
         <div className="flex-1 overflow-auto">
-          <div className="min-w-full max-h-60 overflow-auto bg-indigo-950">
-            <Table>
-              <TableHeader className="bg-yellow-400 text-black">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="bg-yellow-400">
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="text-black">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className={row.getIsSelected() ? "bg-red-300" : ""}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+          <div className="min-w-full max-h-80 overflow-auto bg-indigo-950">
+          <ScrollArea className="h-[100%] relative w-full rounded-sm border-none bg-indigo-950">
+                    <Table>
+                      <TableHeader className="bg-yellow-400 text-black ">
+                       
+                          <TableRow>
+                          <TableHead></TableHead>
+                          <TableHead className="w-[100px] ">transactionId</TableHead>
+                          <TableHead>refId</TableHead>
+                          <TableHead>createdDate</TableHead>
+                          <TableHead>approvalStatus</TableHead>
+                          <TableHead className="text-right">remarks</TableHead>
+                        </TableRow>
+                       
+                      </TableHeader>
+                      <TableBody className="pb-48">
+                      {ApprovalGridData?.data?.map((rows:any,index:number) => (
+          <TableRow onClick={()=>onrowclick(rows)} key={index}>
+            <TableCell>
+        <Checkbox
+          checked={rowSelection[rows.transactionId] ?? false}
+          onCheckedChange={(value) => {
+            const updatedSelection = { ...rowSelection };
+            if (value) {
+              updatedSelection[rows.transactionId] = true;
+            } else {
+              delete updatedSelection[rows.transactionId];
+            }
+            setRowSelection(updatedSelection);
+          }}
+          aria-label="Select row"
+          className="text-white border-white"
+        />
+      </TableCell>
+          
+            <TableCell className="font-medium text-white">{rows.transactionId}</TableCell>
+            <TableCell className="text-white">{rows.refId}</TableCell>
+            <TableCell className="text-white">{rows.createdDate}</TableCell>
+            <TableCell className="text-white">{rows.approvalStatus}</TableCell>
+            <TableCell className="text-right text-white">{rows.remarks}</TableCell>
+          </TableRow>
+        ))}
+                      </TableBody>
+                    </Table>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
           </div>
         </div>
 
@@ -301,7 +294,7 @@ export function ApprovalTable() {
                 variant="outline"
                 size="sm"
                 onClick={handleApprove}
-                disabled={Object.keys(rowSelection).length === 0}
+                // disabled={Object.keys(rowSelection).length === 0}
                 className="bg-green-600 text-white border-green-400 hover:bg-green-400"
               >
                 Approve
@@ -310,7 +303,7 @@ export function ApprovalTable() {
                 variant="outline"
                 size="sm"
                 onClick={handleReject}
-                disabled={Object.keys(rowSelection).length === 0}
+                // disabled={Object.keys(rowSelection).length === 0}
                 className="bg-red-600 text-white border-red-400 hover:bg-red-400"
               >
                 Reject
@@ -345,6 +338,7 @@ export function ApprovalTable() {
           </div>
         </div>
       </div>
+      <ViewGridPagination count={ApprovalGridData?.count}/>
     </div>
   );
 }

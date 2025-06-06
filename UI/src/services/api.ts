@@ -48,6 +48,9 @@ export const GetFieldsBasedOnLocationIdAPI = async (params: any) => {
 export const UpdateFieldvalueAPI = async (data: any) => {
   return await axiosEngineeringLog.put("/Form/UpdateFieldvalue", data);
 };
+export const TransactionsApprovalAPI = async (data: any) => {
+  return await axiosEngineeringLog.put("/Form/TransactionsApproval", data);
+};
 
 export const CreateTransaByLocationIdAPI = async (data: any) => {
   return await axiosEngineeringLog.post("/Form/CreateTransaByLocationId", data);

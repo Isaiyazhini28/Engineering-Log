@@ -20,6 +20,8 @@ import { useEffect, useState } from "react";
 import {
   UpdateFieldvalueAPI,
   UpdateTransactionStatusAPI,
+  TransactionsApprovalAPI,
+
 } from "@/services/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { number, z } from "zod";
@@ -109,6 +111,15 @@ export function DynamicFormComp() {
       queryClient.refetchQueries({ queryKey: ["FieldsBasedOnLocationId"] });
     },
   });
+  const { mutate:TransactionsApprovalAPI  } = useMutation({
+    mutationFn: (data: any) => TransactionsApprovalAPI (data),
+    onError: (e) => {
+      console.log(e, "Error");
+    },
+    onSuccess: (Res) => {
+      toast.success(Res.data);
+      queryClient.refetchQueries({ queryKey: ["FieldsBasedOnLocationId"] });
+    },
   const { mutate: UpdateTransactionStatus } = useMutation({
     mutationFn: (data: any) => UpdateTransactionStatusAPI(data),
     onError: (e) => {
